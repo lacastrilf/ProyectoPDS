@@ -276,49 +276,47 @@
 
       <li class="nav-heading">Pages</li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-bus-front"></i>
-          <span>Transporte</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../Estudiante/transporte.php">
+                <i class="bi bi-bus-front"></i>
+                <span>Transporte</span>
+            </a>
+        </li><!-- End Profile Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-faq.html">
-          <i class="bi bi-egg-fried"></i>
-          <span>Alimentación</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../Estudiante/alimentacion.php">
+                <i class="bi bi-egg-fried"></i>
+                <span>Alimentación</span>
+            </a>
+        </li><!-- End F.A.Q Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-contact.html">
-          <i class="bi bi-backpack2"></i>
-          <span>Materiales de Estudio</span>
-        </a>
-      </li><!-- End Contact Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../Estudiante/materiales.php">
+                <i class="bi bi-backpack2"></i>
+                <span>Materiales de Estudio</span>
+            </a>
+        </li><!-- End Contact Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-register.html">
-          <i class="bi bi-controller"></i>
-          <span>Ocio</span>
-        </a>
-      </li><!-- End Register Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../Estudiante/ocio.php">
+                <i class="bi bi-controller"></i>
+                <span>Ocio</span>
+            </a>
+        </li><!-- End Register Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-piggy-bank"></i>
-          <span>Colchón</span>
-        </a>
-      </li><!-- End Login Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../Estudiante/colchon.php">
+                <i class="bi bi-piggy-bank"></i>
+                <span>Colchón</span>
+            </a>
+        </li><!-- End Login Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-error-404.html">
-          <i class="bi bi-person-bounding-box"></i>
-          <span>Login</span>
-        </a>
-      </li><!-- End Error 404 Page Nav -->
-
-      
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="/ProyectoPDS/inicio/login.php">
+                <i class="bi bi-person-bounding-box"></i>
+                <span>Login</span>
+            </a>
+        </li>
 
     </ul>
 

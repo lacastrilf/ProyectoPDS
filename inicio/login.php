@@ -42,6 +42,7 @@ session_start();
 		$ejecutar2=mysqli_query($conexion, $sql2);
         if($dato)
 			{
+                $_SESSION['id_usuario'] = $dato['id'];
                 $_SESSION['usuario']=$dato['nombre'];
                 if($dato['perfil']=='estudiante'){
 				header("location:../otro/estudiante.php");
