@@ -284,19 +284,6 @@ form{
     color: white;
 }
 
-@font-face{
-	src: url(letra.ttf);
-	font-family: letras;
-}
 
-@font-face{
-	src: url(letras2.ttf);
-	font-family: letras2;
-}
-
-@font-face{
-	src: url(letra3.ttf);
-	font-family: letras3;
-}
 
 

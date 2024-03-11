@@ -276,6 +276,13 @@
 
       <li class="nav-heading">Pages</li>
 
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../otro/estudiante.php">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>Resumen</span>
+            </a>
+        </li>
+
       <li class="nav-item">
         <a class="nav-link collapsed" href="../otro/Estudiante/transporte.php">
           <i class="bi bi-bus-front"></i>
@@ -316,7 +323,7 @@
           <i class="bi bi-person-bounding-box"></i>
           <span>Login</span>
         </a>
-      </li><!-- End Error 404 Page Nav -->
+      </li>
 
     </ul>
 
@@ -338,7 +345,7 @@
       <div class="row">
 
         <!-- Left side columns -->
-        <div class="col-lg-8">
+        <div class="col-lg-12">
           <div class="row">
 
             <!-- Sales Card -->
@@ -412,7 +419,7 @@
             </div><!-- End Revenue Card -->
 
             <!-- Customers Card -->
-            <div class="col-xxl-4 col-xl-12">
+            <div class="col-xxl-4 col-xl-6">
 
               <div class="card info-card customers-card">
 
@@ -445,8 +452,10 @@
 
                 </div>
               </div>
-
-            </div><!-- End Customers Card -->
+            </div>
+          </div>
+        </div>
+             <!-- End Customers Card -->
 
             <!-- Reports -->
             <div class="col-12">
@@ -681,10 +690,8 @@
           </div>
         </div><!-- End Left side columns -->
 
-        <!-- Right side columns -->
-        <div class="col-lg-4">
-
-          <!-- Recent Activity -->
+        <div class="row">
+            <div class="col-lg-4">
           <div class="card">
             <div class="filter">
               <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
@@ -751,13 +758,13 @@
                     Dicta dolorem harum nulla eius. Ut quidem quidem sit quas
                   </div>
                 </div><!-- End activity item-->
-
+              </div>
               </div>
 
             </div>
           </div><!-- End Recent Activity -->
 
-          <!-- Budget Report -->
+          <div class="col-lg-4">
           <div class="card">
             <div class="filter">
               <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
@@ -830,7 +837,8 @@
 
             </div>
           </div><!-- End Budget Report -->
-
+        </div>
+            <div class="col-lg-4">
           <!-- Website Traffic -->
           <div class="card">
             <div class="filter">
@@ -908,12 +916,11 @@
 
             </div>
           </div><!-- End Website Traffic -->
-
+            </div>
 
           </div><!-- End News & Updates -->
 
-        </div><!-- End Right side columns -->
-
+    </div>
       </div>
     </section>
 
