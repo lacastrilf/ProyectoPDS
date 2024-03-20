@@ -29,7 +29,7 @@ session_start();
   <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- Template Main CSS File -->
   <link href="../assets/css/style.css" rel="stylesheet">
 
@@ -401,8 +401,69 @@ session_start();
                                   <i class="bi bi-currency-dollar"></i>
                               </div>
                               <div class="ps-3">
-                                  <h6 id="presupuesto_usuario">400</h6>
-                                      <button type="submit" class="btn btn-outline-success btn-sm">Editar Presupuesto</button>
+                                  <?php
+                                  if (!isset($_SESSION['id_usuario'])) {
+                                      header("location: login.php");
+                                      exit;
+                                  }
+                                  $idUsuario = $_SESSION['id_usuario'];
+                                  $conexion = new mysqli("localhost", "root", "", "base_proyecto");
+                                  $sql = "SELECT presupuesto FROM alimentacion WHERE id_usuario='$idUsuario'";
+                                  $resultado = $conexion->query($sql);
+                                  $dato = $resultado->fetch_assoc();
+
+                                  if ($dato) {
+                                      $_SESSION['presupuesto'] = $dato['presupuesto'];
+                                      $presupuesto = $dato['presupuesto'];
+                                  } else {
+                                      $_SESSION['presupuesto'] = 0;
+                                      $presupuesto = 0;
+                                  }
+                                  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
+                                      $nuevoPresupuesto = $_POST["presupuesto"];
+                                      $sql = "SELECT * FROM alimentacion WHERE id_usuario='$idUsuario'";
+                                      $resultado = $conexion->query($sql);
+
+                                      if ($resultado->num_rows > 0) {
+                                          $sqlUpdate = "UPDATE alimentacion SET presupuesto=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
+                                          $conexion->query($sqlUpdate);
+                                      } else {
+                                          $sqlInsert = "INSERT INTO alimentacion (id_usuario, presupuesto) VALUES ('$idUsuario', $nuevoPresupuesto)";
+                                          $conexion->query($sqlInsert);
+                                      }
+                                      $_SESSION['presupuesto'] = $nuevoPresupuesto;
+                                      $conexion->close();
+                                      header("Location: {$_SERVER['PHP_SELF']}");
+                                      exit;
+                                  }
+                                  ?>
+                                  <h6 id="presupuesto_usuario"><?php echo $presupuesto; ?></h6>
+                                  <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPresupuesto">
+                                      Editar Presupuesto
+                                  </button>
+
+                                  <!-- Modal para editar el presupuesto -->
+                                  <div class="modal fade" id="modalEditarPresupuesto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h5 class="modal-title" id="exampleModalLabel">Editar Presupuesto</h5>
+                                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                  <!-- Formulario para editar el presupuesto -->
+                                                  <form id="formEditarPresupuesto">
+                                                      <div class="mb-3">
+                                                          <label for="presupuesto">Nuevo Presupuesto:</label>
+                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" required>
+                                                      </div>
+                                                      <button type="submit" class="btn btn-success">Guardar</button>
+                                                  </form>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+
                               </div>
                   </div>
                 </div>
@@ -896,7 +957,29 @@ session_start();
   </footer><!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script>
+      $(document).ready(function() {
+          $('#formEditarPresupuesto').submit(function(event) {
+              event.preventDefault();
+              var presupuesto = $('#presupuesto').val();
 
+              $.ajax({
+                  url: 'alimentacion.php',
+                  method: 'POST',
+                  data: { presupuesto: presupuesto },
+                  success: function(response) {
+                      alert('Presupuesto guardado correctamente');
+                      $('#presupuesto_usuario').text(presupuesto);
+                      $('#modalEditarPresupuesto').modal('hide');
+                  },
+                  error: function(xhr, status, error) {
+                      alert('Error al guardar el presupuesto');
+                      console.error(xhr.responseText);
+                  }
+              });
+          });
+      });
+  </script>
   <!-- Vendor JS Files -->
   <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
