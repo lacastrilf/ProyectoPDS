@@ -1,5 +1,40 @@
 <?php
 session_start();
+if (!isset($_SESSION['id_usuario'])) {
+    header("location: /ProyectoPDS/inicio/login.php");
+    exit;
+}
+$idUsuario = $_SESSION['id_usuario'];
+$conexion = new mysqli("localhost", "root", "", "base_proyecto");
+$sql = "SELECT presupuesto FROM transporte WHERE id_usuario='$idUsuario'";
+$resultado = $conexion->query($sql);
+$dato = $resultado->fetch_assoc();
+
+if ($dato) {
+    $_SESSION['presupuesto'] = $dato['presupuesto'];
+    $presupuesto = $dato['presupuesto'];
+} else {
+    $_SESSION['presupuesto'] = 0;
+    $presupuesto = 0;
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
+    $nuevoPresupuesto = $_POST["presupuesto"];
+    $sql = "SELECT * FROM transporte WHERE id_usuario='$idUsuario'";
+    $resultado = $conexion->query($sql);
+
+    if ($resultado->num_rows > 0) {
+        $sqlUpdate = "UPDATE transporte SET presupuesto=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
+        $conexion->query($sqlUpdate);
+    } else {
+        $sqlInsert = "INSERT INTO transporte (id_usuario, presupuesto) VALUES ('$idUsuario', $nuevoPresupuesto)";
+        $conexion->query($sqlInsert);
+    }
+    $_SESSION['presupuesto'] = $nuevoPresupuesto;
+    $conexion->close();
+    header("Location: {$_SERVER['PHP_SELF']}");
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -401,42 +436,7 @@ session_start();
                                   <i class="bi bi-currency-dollar"></i>
                               </div>
                               <div class="ps-3">
-                                  <?php
-                                  if (!isset($_SESSION['id_usuario'])) {
-                                      header("location: /ProyectoPDS/inicio/login.php");
-                                      exit;
-                                  }
-                                  $idUsuario = $_SESSION['id_usuario'];
-                                  $conexion = new mysqli("localhost", "root", "", "base_proyecto");
-                                  $sql = "SELECT presupuesto FROM transporte WHERE id_usuario='$idUsuario'";
-                                  $resultado = $conexion->query($sql);
-                                  $dato = $resultado->fetch_assoc();
 
-                                  if ($dato) {
-                                      $_SESSION['presupuesto'] = $dato['presupuesto'];
-                                      $presupuesto = $dato['presupuesto'];
-                                  } else {
-                                      $_SESSION['presupuesto'] = 0;
-                                      $presupuesto = 0;
-                                  }
-                                  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
-                                      $nuevoPresupuesto = $_POST["presupuesto"];
-                                      $sql = "SELECT * FROM transporte WHERE id_usuario='$idUsuario'";
-                                      $resultado = $conexion->query($sql);
-
-                                      if ($resultado->num_rows > 0) {
-                                          $sqlUpdate = "UPDATE transporte SET presupuesto=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
-                                          $conexion->query($sqlUpdate);
-                                      } else {
-                                          $sqlInsert = "INSERT INTO transporte (id_usuario, presupuesto) VALUES ('$idUsuario', $nuevoPresupuesto)";
-                                          $conexion->query($sqlInsert);
-                                      }
-                                      $_SESSION['presupuesto'] = $nuevoPresupuesto;
-                                      $conexion->close();
-                                      header("Location: {$_SERVER['PHP_SELF']}");
-                                      exit;
-                                  }
-                                  ?>
                                   <h6 id="presupuesto_usuario">$<?php echo $presupuesto; ?></h6>
                                   <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPresupuesto">
                                       Editar Presupuesto
