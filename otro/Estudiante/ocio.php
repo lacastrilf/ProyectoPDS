@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,8 +29,8 @@
   <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
-  <!-- Template Main CSS File -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Template Main CSS File -->
   <link href="../assets/css/style.css" rel="stylesheet">
 
   <!-- =======================================================
@@ -274,12 +278,14 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-heading">Pages</li>
+
         <li class="nav-item">
             <a class="nav-link collapsed" href="/ProyectoPDS/otro/estudiante.php">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>Resumen</span>
             </a>
         </li>
+
         <li class="nav-item">
             <a class="nav-link collapsed" href="../Estudiante/transporte.php">
                 <i class="bi bi-bus-front"></i>
@@ -321,7 +327,6 @@
                 <span>Login</span>
             </a>
         </li>
-
     </ul>
 
   </aside><!-- End Sidebar-->
@@ -346,38 +351,38 @@
           <div class="row">
 
             <!-- Sales Card -->
-              <div class="col-xxl-6 col-md-6">
-                  <div class="card info-card sales-card">
+            <div class="col-xxl-6 col-md-6">
+              <div class="card info-card sales-card">
 
-                      <div class="filter">
-                          <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                              <li class="dropdown-header text-start">
-                                  <h6>Filter</h6>
-                              </li>
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6>Filter</h6>
+                    </li>
 
-                              <li><a class="dropdown-item" href="#">Hoy</a></li>
-                              <li><a class="dropdown-item" href="#">este mes</a></li>
-                          </ul>
-                      </div>
+                    <li><a class="dropdown-item" href="#">Hoy</a></li>
+                    <li><a class="dropdown-item" href="#">este mes</a></li>
+                  </ul>
+                </div>
 
-                      <div class="card-body">
-                          <h5 class="card-title">Gastos realizados <span>| este mes</span></h5>
+                <div class="card-body">
+                  <h5 class="card-title">Gastos realizados <span>| este mes</span></h5>
 
-                          <div class="d-flex align-items-center">
-                              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                  <i class="bi bi-cart"></i>
-                              </div>
-                              <div class="ps-3">
-                                  <h6>145</h6>
-                                  <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-cart"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6>145</h6>
+                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
 
-                              </div>
-                          </div>
-                      </div>
-
+                    </div>
                   </div>
-              </div><!-- End Sales Card -->
+                </div>
+
+              </div>
+            </div><!-- End Sales Card -->
               <!-- Revenue Card -->
               <div class="col-xxl-6 col-md-6">
                   <div class="card info-card revenue-card">
@@ -388,14 +393,75 @@
                                   <i class="bi bi-currency-dollar"></i>
                               </div>
                               <div class="ps-3">
-                                  <h6 id="presupuesto_usuario">400</h6>
-                                  <button type="submit" class="btn btn-outline-success btn-sm">Editar Presupuesto</button>
-                              </div>
-                          </div>
-                      </div>
+                                  <?php
+                                  if (!isset($_SESSION['id_usuario'])) {
+                                      header("location: /ProyectoPDS/inicio/login.php");
+                                      exit;
+                                  }
+                                  $idUsuario = $_SESSION['id_usuario'];
+                                  $conexion = new mysqli("localhost", "root", "", "base_proyecto");
+                                  $sql = "SELECT presupuesto FROM ocio WHERE id_usuario='$idUsuario'";
+                                  $resultado = $conexion->query($sql);
+                                  $dato = $resultado->fetch_assoc();
 
+                                  if ($dato) {
+                                      $_SESSION['presupuesto'] = $dato['presupuesto'];
+                                      $presupuesto = $dato['presupuesto'];
+                                  } else {
+                                      $_SESSION['presupuesto'] = 0;
+                                      $presupuesto = 0;
+                                  }
+                                  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
+                                      $nuevoPresupuesto = $_POST["presupuesto"];
+                                      $sql = "SELECT * FROM ocio WHERE id_usuario='$idUsuario'";
+                                      $resultado = $conexion->query($sql);
+
+                                      if ($resultado->num_rows > 0) {
+                                          $sqlUpdate = "UPDATE ocio SET presupuesto=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
+                                          $conexion->query($sqlUpdate);
+                                      } else {
+                                          $sqlInsert = "INSERT INTO ocio (id_usuario, presupuesto) VALUES ('$idUsuario', $nuevoPresupuesto)";
+                                          $conexion->query($sqlInsert);
+                                      }
+                                      $_SESSION['presupuesto'] = $nuevoPresupuesto;
+                                      $conexion->close();
+                                      header("Location: {$_SERVER['PHP_SELF']}");
+                                      exit;
+                                  }
+                                  ?>
+                                  <h6 id="presupuesto_usuario">$<?php echo $presupuesto; ?></h6>
+                                  <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPresupuesto">
+                                      Editar Presupuesto
+                                  </button>
+
+                                  <!-- Modal para editar el presupuesto -->
+                                  <div class="modal fade" id="modalEditarPresupuesto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h5 class="modal-title" id="exampleModalLabel">Editar Presupuesto</h5>
+                                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                  <!-- Formulario para editar el presupuesto -->
+                                                  <form id="formEditarPresupuesto">
+                                                      <div class="mb-3">
+                                                          <label for="presupuesto">Nuevo Presupuesto:</label>
+                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" required>
+                                                      </div>
+                                                      <button type="submit" class="btn btn-success">Guardar</button>
+                                                  </form>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                              </div>
                   </div>
+                </div>
+
               </div>
+            </div><!-- End Revenue Card -->
 
             <!-- Reports -->
             <div class="col-12">
@@ -874,16 +940,34 @@
       &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
     </div>
     <div class="credits">
-      <!-- All the links in the footer should remain intact. -->
-      <!-- You can delete the links only if you purchased the pro version. -->
-      <!-- Licensing information: https://bootstrapmade.com/license/ -->
-      <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
       Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
     </div>
   </footer><!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script>
+      $(document).ready(function() {
+          $('#formEditarPresupuesto').submit(function(event) {
+              event.preventDefault();
+              var presupuesto = $('#presupuesto').val();
 
+              $.ajax({
+                  url: 'ocio.php',
+                  method: 'POST',
+                  data: { presupuesto: presupuesto },
+                  success: function(response) {
+                      alert('Presupuesto guardado correctamente');
+                      $('#presupuesto_usuario').text("$" + presupuesto);
+                      $('#modalEditarPresupuesto').modal('hide');
+                  },
+                  error: function(xhr, status, error) {
+                      alert('Error al guardar el presupuesto');
+                      console.error(xhr.responseText);
+                  }
+              });
+          });
+      });
+  </script>
   <!-- Vendor JS Files -->
   <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
