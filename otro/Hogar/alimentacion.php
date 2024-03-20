@@ -403,7 +403,7 @@ session_start();
                               <div class="ps-3">
                                   <?php
                                   if (!isset($_SESSION['id_usuario'])) {
-                                      header("location: login.php");
+                                      header("location: /ProyectoPDS/inicio/login.php");
                                       exit;
                                   }
                                   $idUsuario = $_SESSION['id_usuario'];
@@ -437,12 +437,11 @@ session_start();
                                       exit;
                                   }
                                   ?>
-                                  <h6 id="presupuesto_usuario"><?php echo $presupuesto; ?></h6>
+                                  <h6 id="presupuesto_usuario">$<?php echo $presupuesto; ?></h6>
                                   <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPresupuesto">
                                       Editar Presupuesto
                                   </button>
 
-                                  <!-- Modal para editar el presupuesto -->
                                   <div class="modal fade" id="modalEditarPresupuesto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                       <div class="modal-dialog">
                                           <div class="modal-content">
@@ -451,7 +450,6 @@ session_start();
                                                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                               </div>
                                               <div class="modal-body">
-                                                  <!-- Formulario para editar el presupuesto -->
                                                   <form id="formEditarPresupuesto">
                                                       <div class="mb-3">
                                                           <label for="presupuesto">Nuevo Presupuesto:</label>
@@ -969,7 +967,7 @@ session_start();
                   data: { presupuesto: presupuesto },
                   success: function(response) {
                       alert('Presupuesto guardado correctamente');
-                      $('#presupuesto_usuario').text(presupuesto);
+                      $('#presupuesto_usuario').text("$" +presupuesto);
                       $('#modalEditarPresupuesto').modal('hide');
                   },
                   error: function(xhr, status, error) {
