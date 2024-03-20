@@ -280,42 +280,50 @@ session_start();
       <li class="nav-heading">Pages</li>
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="/ProyectoPDS/otro/estudiante.php">
+            <a class="nav-link collapsed" href="/ProyectoPDS/otro/hogar.php">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>Resumen</span>
             </a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/transporte.php">
+            <a class="nav-link collapsed" href="../Hogar/transporte.php">
                 <i class="bi bi-bus-front"></i>
                 <span>Transporte</span>
             </a>
         </li><!-- End Profile Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/alimentacion.php">
+            <a class="nav-link collapsed" href="../Hogar/alimentacion.php">
                 <i class="bi bi-egg-fried"></i>
                 <span>Alimentación</span>
             </a>
         </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/materiales.php">
-                <i class="bi bi-backpack2"></i>
-                <span>Materiales de Estudio</span>
+            <a class="nav-link collapsed" href="../Hogar/servicios.php">
+                <i class="bi bi-receipt"></i>
+                <span>Servicios</span>
             </a>
-        </li><!-- End Contact Page Nav -->
+        </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/ocio.php">
+            <a class="nav-link collapsed" href="../Hogar/vivienda.php">
+                <i class="bi bi-house"></i>
+                <span>Vivienda</span>
+            </a>
+        </li>
+
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../Hogar/ocio.php">
                 <i class="bi bi-controller"></i>
                 <span>Ocio</span>
             </a>
         </li><!-- End Register Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/colchon.php">
+            <a class="nav-link collapsed" href="../Hogar/colchon.php">
                 <i class="bi bi-piggy-bank"></i>
                 <span>Colchón</span>
             </a>

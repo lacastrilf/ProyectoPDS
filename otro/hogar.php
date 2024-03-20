@@ -44,10 +44,9 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="index.html" class="logo d-flex align-items-center">
-        <img src="assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">NiceAdmin</span>
-      </a>
+        <a href="/ProyectoPDS/inicio/index.php" class="logo d-flex align-items-center">
+            <span class="d-none d-lg-block">INICIO</span>
+        </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
 
@@ -277,54 +276,62 @@
 
       <li class="nav-heading">Pages</li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Alimentación</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../otro/hogar.php">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>Resumen</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../otro/Hogar/transporte.php">
+                <i class="bi bi-bus-front"></i>
+                <span>Transporte</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../otro/Hogar/alimentacion.php">
+                <i class="bi bi-egg-fried"></i>
+                <span>Alimentación</span>
+            </a>
+        </li><!-- End Profile Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-faq.html">
-          <i class="bi bi-question-circle"></i>
+        <a class="nav-link collapsed" href="../otro/Hogar/servicios.php">
+          <i class="bi bi-receipt"></i>
           <span>Servicios</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-contact.html">
-          <i class="bi bi-envelope"></i>
+        <a class="nav-link collapsed" href="../otro/Hogar/vivienda.php">
+          <i class="bi bi-house"></i>
           <span>Vivienda</span>
         </a>
-      </li><!-- End Contact Page Nav -->
+      </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-register.html">
-          <i class="bi bi-card-list"></i>
-          <span>Transporte</span>
-        </a>
-      </li><!-- End Register Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Ocio</span>
-        </a>
-      </li><!-- End Login Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../otro/Hogar/ocio.php">
+                <i class="bi bi-controller"></i>
+                <span>Ocio</span>
+            </a>
+        </li><!-- End Register Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Colchón</span>
-        </a>
-      </li><!-- End Login Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../otro/Hogar/colchon.php">
+                <i class="bi bi-piggy-bank"></i>
+                <span>Colchón</span>
+            </a>
+        </li><!-- End Login Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-error-404.html">
-          <i class="bi bi-dash-circle"></i>
-          <span>Login</span>
-        </a>
-      </li><!-- End Error 404 Page Nav -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../inicio/login.php">
+                <i class="bi bi-person-bounding-box"></i>
+                <span>Login</span>
+            </a>
+        </li><!-- End Error 404 Page Nav -->
 
       
 

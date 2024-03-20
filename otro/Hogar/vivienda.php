@@ -1,7 +1,3 @@
-<?php
-session_start();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -278,44 +274,50 @@ session_start();
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-heading">Pages</li>
-
         <li class="nav-item">
-            <a class="nav-link collapsed" href="/ProyectoPDS/otro/estudiante.php">
+            <a class="nav-link collapsed" href="/ProyectoPDS/otro/hogar.php">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>Resumen</span>
             </a>
         </li>
-
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/transporte.php">
+            <a class="nav-link collapsed" href="../Hogar/transporte.php">
                 <i class="bi bi-bus-front"></i>
                 <span>Transporte</span>
             </a>
         </li><!-- End Profile Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/alimentacion.php">
+            <a class="nav-link collapsed" href="../Hogar/alimentacion.php">
                 <i class="bi bi-egg-fried"></i>
                 <span>Alimentación</span>
             </a>
         </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/materiales.php">
-                <i class="bi bi-backpack2"></i>
-                <span>Materiales de Estudio</span>
+            <a class="nav-link collapsed" href="../Hogar/servicios.php">
+                <i class="bi bi-receipt"></i>
+                <span>Servicios</span>
             </a>
-        </li><!-- End Contact Page Nav -->
+        </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/ocio.php">
+            <a class="nav-link collapsed" href="../Hogar/vivienda.php">
+                <i class="bi bi-house"></i>
+                <span>Vivienda</span>
+            </a>
+        </li>
+
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="../Hogar/ocio.php">
                 <i class="bi bi-controller"></i>
                 <span>Ocio</span>
             </a>
         </li><!-- End Register Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/colchon.php">
+            <a class="nav-link collapsed" href="../Hogar/colchon.php">
                 <i class="bi bi-piggy-bank"></i>
                 <span>Colchón</span>
             </a>
@@ -350,39 +352,38 @@ session_start();
         <div class="col-lg-8">
           <div class="row">
 
-            <!-- Sales Card -->
-            <div class="col-xxl-6 col-md-6">
-              <div class="card info-card sales-card">
+              <div class="col-xxl-6 col-md-6">
+                  <div class="card info-card sales-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
+                      <div class="filter">
+                          <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                              <li class="dropdown-header text-start">
+                                  <h6>Filter</h6>
+                              </li>
 
-                    <li><a class="dropdown-item" href="#">Hoy</a></li>
-                    <li><a class="dropdown-item" href="#">este mes</a></li>
-                  </ul>
-                </div>
+                              <li><a class="dropdown-item" href="#">Hoy</a></li>
+                              <li><a class="dropdown-item" href="#">este mes</a></li>
+                          </ul>
+                      </div>
 
-                <div class="card-body">
-                  <h5 class="card-title">Gastos realizados <span>| este mes</span></h5>
+                      <div class="card-body">
+                          <h5 class="card-title">Gastos realizados <span>| este mes</span></h5>
 
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>145</h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
+                          <div class="d-flex align-items-center">
+                              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                  <i class="bi bi-cart"></i>
+                              </div>
+                              <div class="ps-3">
+                                  <h6>145</h6>
+                                  <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
 
-                    </div>
+                              </div>
+                          </div>
+                      </div>
+
                   </div>
-                </div>
-
-              </div>
-            </div><!-- End Sales Card -->
+              </div><!-- End Sales Card -->
               <!-- Revenue Card -->
               <div class="col-xxl-6 col-md-6">
                   <div class="card info-card revenue-card">
@@ -394,13 +395,13 @@ session_start();
                               </div>
                               <div class="ps-3">
                                   <h6 id="presupuesto_usuario">400</h6>
-                                      <button type="submit" class="btn btn-outline-success btn-sm">Editar Presupuesto</button>
+                                  <button type="submit" class="btn btn-outline-success btn-sm">Editar Presupuesto</button>
                               </div>
-                  </div>
-                </div>
+                          </div>
+                      </div>
 
+                  </div>
               </div>
-            </div><!-- End Revenue Card -->
 
             <!-- Reports -->
             <div class="col-12">
