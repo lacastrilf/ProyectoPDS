@@ -336,13 +336,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
         </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Estudiante/materiales.php">
-                <i class="bi bi-backpack2"></i>
-                <span>Materiales de Estudio</span>
-            </a>
-        </li><!-- End Contact Page Nav -->
-
-        <li class="nav-item">
             <a class="nav-link collapsed" href="../Estudiante/ocio.php">
                 <i class="bi bi-controller"></i>
                 <span>Ocio</span>
