@@ -155,3 +155,53 @@ input[type="text"] {
     padding: 20px;
     text-align: center;
 }
+.tipo{
+    position: absolute;
+    margin-top: 9vw;
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.tipo1,
+.tipo2{
+    position: relative;
+    width: 12vw;
+    height: 6vw;
+    background-color: white;
+    border: #d2d1dd solid 1px;
+    border-radius: 8px;
+    display: flex;
+    align-items:center;
+    flex-direction: column;
+    justify-content: center;
+    transition: 0.5s ease;
+}
+
+.contenedor-tipos {
+    display: flex;
+    align-items: center;
+}
+
+.tipo1,
+.tipo2 {
+    flex: 0.5;
+    margin-right: 5%;
+    margin-left: 5%;
+    align-items: center;
+    margin-bottom: 5%;
+}
+
+.tipo1.seleccionado,
+.tipo2.seleccionado {
+    background-color: #008cff;
+    color: white;
+}
+
+.tipo1.seleccionado i,
+.tipo2.seleccionado i {
+    display: block;
+}
