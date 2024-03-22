@@ -207,7 +207,7 @@
           </div><!-- End Special title treatmen -->
 
           <div class="card">
-            <img src="tud.png" class="card-img-top" alt="...">
+            <img src="tud.jpg" class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">Podcast sobre Finanzas</h5>
               <p class="card-text">Tu dinero nunca duerme: Dirigido por Luis Fernando Quintero y Manuel Llamas, este podcast se presenta como "el primer programa de cultura financiera de la radio".</p>
