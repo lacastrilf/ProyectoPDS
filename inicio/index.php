@@ -42,9 +42,7 @@
     <div class="container d-flex justify-content-between">
 
       <div class="logo">
-        <!-- Uncomment below if you prefer to use an text logo -->
-        <!-- <h1><a href="index.html">NewBiz</a></h1> -->
-        <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>
+        <a href="index.php"><img src="assets/img/SmartSpends.png" alt="" class="img-fluid"></a>
       </div>
 
       <nav id="navbar" class="navbar">
@@ -52,8 +50,8 @@
           <li><a class="nav-link scrollto active" href="#hero">Home</a></li>
           <li><a class="nav-link scrollto" href="#about">Nosotros</a></li>
           <li><a class="nav-link scrollto" href="#services">Servicios</a></li>
-          <li><a class="nav-link scrollto " href="#portfolio">Tutorial</a></li>
-          <li><a class="nav-link scrollto" href="login.php">Login</a></li>
+          <li><a class="nav-link scrollto " href="../otro/materiales.php">Zona de aprendizaje</a></li>
+          <li><a class="nav-link scrollto" href="login.php">Ingresar</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->

@@ -61,16 +61,16 @@ if(isset($_POST['enviar'])){
     <!-- Cover Box -->
     <div id="cover">
         <!-- Sign Up Section -->
-        <h1 class="sign-up">Hello, Friend!</h1>
-        <p class="sign-up">Enter your personal details<br> and start a journey with us</p>
-        <a class="button sign-up" href="#cover">Sign Up</a>
+        <h1 class="sign-up">¿Estas listo para ahorrar?</h1>
+        <p class="sign-up">Si no tienes una cuenta ven <br> y registrate aqui con nosotros</p>
+        <a class="button sign-up" href="#cover">Registrate</a>
         <!-- Sign In Section -->
-        <h1 class="sign-in">Welcome Back!</h1>
-        <p class="sign-in">To keep connected with us please<br> login with your personal info</p>
+        <h1 class="sign-in">¡Bienvenido de vuelta!</h1>
+        <p class="sign-in">Si ya tienes una cuenta porfavor<br> ingresa aqui</p>
         <br>
-        <a class="button sub sign-in" href="#">Sign In</a>
+        <a class="button sub sign-in" href="#">Ingresar</a>
     </div>
-    <!-- Login Box -->
+
     <div id="login" >
         <h1>Ingresar</h1>
         <p></p>
