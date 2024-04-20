@@ -6,27 +6,27 @@ if (!isset($_SESSION['id_usuario'])) {
 }
 $idUsuario = $_SESSION['id_usuario'];
 $conexion = new mysqli("localhost", "root", "", "base_proyecto");
-$sql = "SELECT presupuesto FROM alimentacion WHERE id_usuario='$idUsuario'";
+$sql = "SELECT alimentacion FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultado = $conexion->query($sql);
 $dato = $resultado->fetch_assoc();
 
 if ($dato) {
-    $_SESSION['presupuesto'] = $dato['presupuesto'];
-    $presupuesto = $dato['presupuesto'];
+    $_SESSION['presupuesto'] = $dato['alimentacion'];
+    $presupuesto = $dato['alimentacion'];
 } else {
     $_SESSION['presupuesto'] = 0;
     $presupuesto = 0;
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
     $nuevoPresupuesto = $_POST["presupuesto"];
-    $sql = "SELECT * FROM alimentacion WHERE id_usuario='$idUsuario'";
+    $sql = "SELECT * FROM presupuestos WHERE id_usuario='$idUsuario'";
     $resultado = $conexion->query($sql);
 
     if ($resultado->num_rows > 0) {
-        $sqlUpdate = "UPDATE alimentacion SET presupuesto=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
+        $sqlUpdate = "UPDATE presupuestos SET alimentacion=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
         $conexion->query($sqlUpdate);
     } else {
-        $sqlInsert = "INSERT INTO alimentacion (id_usuario, presupuesto) VALUES ('$idUsuario', $nuevoPresupuesto)";
+        $sqlInsert = "INSERT INTO presupuestos (id_usuario, alimentacion) VALUES ('$idUsuario', $nuevoPresupuesto)";
         $conexion->query($sqlInsert);
     }
     $_SESSION['presupuesto'] = $nuevoPresupuesto;
@@ -34,7 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
     header("Location: {$_SERVER['PHP_SELF']}");
     exit;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -43,19 +42,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title>Dashboard - NiceAdmin Bootstrap Template</title>
+  <title>SmartSpends</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
-
   <!-- Favicons -->
   <link href="../assets/img/favicon.png" rel="icon">
   <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-
   <!-- Vendor CSS Files -->
   <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -430,7 +425,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
               <div class="col-xxl-6 col-md-6">
                   <div class="card info-card revenue-card">
                       <div class="card-body">
-                          <h5 class="card-title">Presupuesto <span>| Este Mes</span></h5>
+                          <h5 class="card-title">Presupuesto <span>| Esta Semana</span></h5>
                           <div class="d-flex align-items-center">
                               <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                   <i class="bi bi-currency-dollar"></i>
@@ -453,7 +448,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
                                                   <form id="formEditarPresupuesto">
                                                       <div class="mb-3">
                                                           <label for="presupuesto">Nuevo Presupuesto:</label>
-                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" required>
+                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" step="any"  required>
                                                       </div>
                                                       <button type="submit" class="btn btn-success">Guardar</button>
                                                   </form>

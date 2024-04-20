@@ -1,22 +1,31 @@
+<?php
+session_start();
+if (!isset($_SESSION['id_usuario'])) {
+    header("location: /ProyectoPDS/inicio/login.php");
+    exit;
+}
+$idUsuario = $_SESSION['id_usuario'];
+$conexion = new mysqli("localhost", "root", "", "base_proyecto");
+
+// Obtener la suma de todos los presupuestos
+$sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + servicios + transporte + vivienda) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
+$resultadoSuma = $conexion->query($sqlSuma);
+$sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
+?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title>Dashboard - NiceAdmin Bootstrap Template</title>
+  <title>SmartSpends</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
-
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -25,10 +34,8 @@
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
-
   <!-- =======================================================
   * Template Name: NiceAdmin
   * Updated: Jan 29 2024 with Bootstrap v5.3.2
@@ -37,42 +44,34 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 </head>
-
 <body>
 
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-
     <div class="d-flex align-items-center justify-content-between">
       <a href="/ProyectoPDS/inicio/index.php" class="logo d-flex align-items-center">
         <span class="d-none d-lg-block">INICIO</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
-
     <div class="search-bar">
       <form class="search-form d-flex align-items-center" method="POST" action="#">
         <input type="text" name="query" placeholder="Search" title="Enter search keyword">
         <button type="submit" title="Search"><i class="bi bi-search"></i></button>
       </form>
     </div><!-- End Search Bar -->
-
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
-
         <li class="nav-item d-block d-lg-none">
           <a class="nav-link nav-icon search-bar-toggle " href="#">
             <i class="bi bi-search"></i>
           </a>
         </li><!-- End Search Icon-->
-
         <li class="nav-item dropdown">
-
           <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
             <i class="bi bi-bell"></i>
             <span class="badge bg-primary badge-number">4</span>
           </a><!-- End Notification Icon -->
-
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">
               You have 4 new notifications
@@ -81,7 +80,6 @@
             <li>
               <hr class="dropdown-divider">
             </li>
-
             <li class="notification-item">
               <i class="bi bi-exclamation-circle text-warning"></i>
               <div>
@@ -90,11 +88,9 @@
                 <p>30 min. ago</p>
               </div>
             </li>
-
             <li>
               <hr class="dropdown-divider">
             </li>
-
             <li class="notification-item">
               <i class="bi bi-x-circle text-danger"></i>
               <div>
@@ -103,11 +99,9 @@
                 <p>1 hr. ago</p>
               </div>
             </li>
-
             <li>
               <hr class="dropdown-divider">
             </li>
-
             <li class="notification-item">
               <i class="bi bi-check-circle text-success"></i>
               <div>
@@ -116,11 +110,9 @@
                 <p>2 hrs. ago</p>
               </div>
             </li>
-
             <li>
               <hr class="dropdown-divider">
             </li>
-
             <li class="notification-item">
               <i class="bi bi-info-circle text-primary"></i>
               <div>
@@ -129,16 +121,13 @@
                 <p>4 hrs. ago</p>
               </div>
             </li>
-
             <li>
               <hr class="dropdown-divider">
             </li>
             <li class="dropdown-footer">
               <a href="#">Show all notifications</a>
             </li>
-
           </ul><!-- End Notification Dropdown Items -->
-
         </li><!-- End Notification Nav -->
 
         <li class="nav-item dropdown">
@@ -222,7 +211,6 @@
             <li>
               <hr class="dropdown-divider">
             </li>
-
             <li>
               <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
                 <i class="bi bi-person"></i>
@@ -335,31 +323,25 @@
 
     <section class="section dashboard">
       <div class="row">
-
         <!-- Left side columns -->
         <div class="col-lg-12">
           <div class="row">
-
             <!-- Sales Card -->
-            <div class="col-xxl-4 col-md-6">
+            <div class="col-xxl-4 col-xl-4 col-md-4">
               <div class="card info-card sales-card">
-
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-
                     <li><a class="dropdown-item" href="#">Today</a></li>
                     <li><a class="dropdown-item" href="#">This Month</a></li>
                     <li><a class="dropdown-item" href="#">This Year</a></li>
                   </ul>
                 </div>
-
                 <div class="card-body">
                   <h5 class="card-title">Sales <span>| Today</span></h5>
-
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-cart"></i>
@@ -367,70 +349,54 @@
                     <div class="ps-3">
                       <h6>145</h6>
                       <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
                     </div>
                   </div>
                 </div>
-
               </div>
             </div><!-- End Sales Card -->
-
             <!-- Revenue Card -->
-            <div class="col-xxl-4 col-md-6">
+            <div class="col-xxl-4 col-xl-4 col-md-4">
               <div class="card info-card revenue-card">
-
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-
                     <li><a class="dropdown-item" href="#">Today</a></li>
                     <li><a class="dropdown-item" href="#">This Month</a></li>
                     <li><a class="dropdown-item" href="#">This Year</a></li>
                   </ul>
                 </div>
-
                 <div class="card-body">
-                  <h5 class="card-title">Revenue <span>| This Month</span></h5>
-
+                  <h5 class="card-title"> Presupuesto <span>| Esta semana</span></h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>$3,264</h6>
-                      <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
-                    </div>
+                      <h6>$<?php echo number_format($sumaTotal, 2); ?></h6>
+                      </div>
                   </div>
                 </div>
-
               </div>
             </div><!-- End Revenue Card -->
-
             <!-- Customers Card -->
-            <div class="col-xxl-4 col-xl-6">
-
+            <div class="col-xxl-4 col-xl-4 col-md-4">
               <div class="card info-card customers-card">
-
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-
                     <li><a class="dropdown-item" href="#">Today</a></li>
                     <li><a class="dropdown-item" href="#">This Month</a></li>
                     <li><a class="dropdown-item" href="#">This Year</a></li>
                   </ul>
                 </div>
-
                 <div class="card-body">
                   <h5 class="card-title">Customers <span>| This Year</span></h5>
-
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-people"></i>
@@ -438,40 +404,32 @@
                     <div class="ps-3">
                       <h6>1244</h6>
                       <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
-
                     </div>
                   </div>
-
                 </div>
               </div>
             </div>
           </div>
         </div>
              <!-- End Customers Card -->
-
             <!-- Reports -->
             <div class="col-12">
               <div class="card">
-
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-
                     <li><a class="dropdown-item" href="#">Today</a></li>
                     <li><a class="dropdown-item" href="#">This Month</a></li>
                     <li><a class="dropdown-item" href="#">This Year</a></li>
                   </ul>
                 </div>
-
                 <div class="card-body">
                   <h5 class="card-title">Reports <span>/Today</span></h5>
-
                   <!-- Line Chart -->
                   <div id="reportsChart"></div>
-
                   <script>
                     document.addEventListener("DOMContentLoaded", () => {
                       new ApexCharts(document.querySelector("#reportsChart"), {
@@ -525,32 +483,25 @@
                     });
                   </script>
                   <!-- End Line Chart -->
-
                 </div>
-
               </div>
             </div><!-- End Reports -->
-
             <!-- Recent Sales -->
             <div class="col-12">
               <div class="card recent-sales overflow-auto">
-
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-
                     <li><a class="dropdown-item" href="#">Today</a></li>
                     <li><a class="dropdown-item" href="#">This Month</a></li>
                     <li><a class="dropdown-item" href="#">This Year</a></li>
                   </ul>
                 </div>
-
                 <div class="card-body">
                   <h5 class="card-title">Recent Sales <span>| Today</span></h5>
-
                   <table class="table table-borderless datatable">
                     <thead>
                       <tr>
@@ -599,32 +550,25 @@
                       </tr>
                     </tbody>
                   </table>
-
                 </div>
-
               </div>
             </div><!-- End Recent Sales -->
-
             <!-- Top Selling -->
             <div class="col-12">
               <div class="card top-selling overflow-auto">
-
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-
                     <li><a class="dropdown-item" href="#">Today</a></li>
                     <li><a class="dropdown-item" href="#">This Month</a></li>
                     <li><a class="dropdown-item" href="#">This Year</a></li>
                   </ul>
                 </div>
-
                 <div class="card-body pb-0">
                   <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
                   <table class="table table-borderless">
                     <thead>
                       <tr>
@@ -673,12 +617,9 @@
                       </tr>
                     </tbody>
                   </table>
-
                 </div>
-
               </div>
             </div><!-- End Top Selling -->
-
           </div>
         </div><!-- End Left side columns -->
 
@@ -691,18 +632,14 @@
                 <li class="dropdown-header text-start">
                   <h6>Filter</h6>
                 </li>
-
                 <li><a class="dropdown-item" href="#">Today</a></li>
                 <li><a class="dropdown-item" href="#">This Month</a></li>
                 <li><a class="dropdown-item" href="#">This Year</a></li>
               </ul>
             </div>
-
             <div class="card-body">
               <h5 class="card-title">Recent Activity <span>| Today</span></h5>
-
               <div class="activity">
-
                 <div class="activity-item d-flex">
                   <div class="activite-label">32 min</div>
                   <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
@@ -710,7 +647,6 @@
                     Quia quae rerum <a href="#" class="fw-bold text-dark">explicabo officiis</a> beatae
                   </div>
                 </div><!-- End activity item-->
-
                 <div class="activity-item d-flex">
                   <div class="activite-label">56 min</div>
                   <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
@@ -718,7 +654,6 @@
                     Voluptatem blanditiis blanditiis eveniet
                   </div>
                 </div><!-- End activity item-->
-
                 <div class="activity-item d-flex">
                   <div class="activite-label">2 hrs</div>
                   <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
@@ -726,7 +661,6 @@
                     Voluptates corrupti molestias voluptatem
                   </div>
                 </div><!-- End activity item-->
-
                 <div class="activity-item d-flex">
                   <div class="activite-label">1 day</div>
                   <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
@@ -734,7 +668,6 @@
                     Tempore autem saepe <a href="#" class="fw-bold text-dark">occaecati voluptatem</a> tempore
                   </div>
                 </div><!-- End activity item-->
-
                 <div class="activity-item d-flex">
                   <div class="activite-label">2 days</div>
                   <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
@@ -742,7 +675,6 @@
                     Est sit eum reiciendis exercitationem
                   </div>
                 </div><!-- End activity item-->
-
                 <div class="activity-item d-flex">
                   <div class="activite-label">4 weeks</div>
                   <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
@@ -752,7 +684,6 @@
                 </div><!-- End activity item-->
               </div>
               </div>
-
             </div>
           </div><!-- End Recent Activity -->
 
@@ -764,18 +695,14 @@
                 <li class="dropdown-header text-start">
                   <h6>Filter</h6>
                 </li>
-
                 <li><a class="dropdown-item" href="#">Today</a></li>
                 <li><a class="dropdown-item" href="#">This Month</a></li>
                 <li><a class="dropdown-item" href="#">This Year</a></li>
               </ul>
             </div>
-
             <div class="card-body pb-0">
               <h5 class="card-title">Budget Report <span>| This Month</span></h5>
-
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
-
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
                   var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
@@ -826,7 +753,6 @@
                   });
                 });
               </script>
-
             </div>
           </div><!-- End Budget Report -->
         </div>
@@ -839,7 +765,6 @@
                 <li class="dropdown-header text-start">
                   <h6>Filter</h6>
                 </li>
-
                 <li><a class="dropdown-item" href="#">Today</a></li>
                 <li><a class="dropdown-item" href="#">This Month</a></li>
                 <li><a class="dropdown-item" href="#">This Year</a></li>
@@ -848,9 +773,7 @@
 
             <div class="card-body pb-0">
               <h5 class="card-title">Website Traffic <span>| Today</span></h5>
-
               <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
-
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
                   echarts.init(document.querySelector("#trafficChart")).setOption({
@@ -905,19 +828,14 @@
                   });
                 });
               </script>
-
             </div>
           </div><!-- End Website Traffic -->
             </div>
-
           </div><!-- End News & Updates -->
-
     </div>
       </div>
     </section>
-
   </main><!-- End #main -->
-
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <div class="copyright">
@@ -931,9 +849,7 @@
       Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
     </div>
   </footer><!-- End Footer -->
-
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
   <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -943,10 +859,7 @@
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
-
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-
 </body>
-
 </html>

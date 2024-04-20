@@ -1,3 +1,17 @@
+<?php
+session_start();
+if (!isset($_SESSION['id_usuario'])) {
+    header("location: /ProyectoPDS/inicio/login.php");
+    exit;
+}
+$idUsuario = $_SESSION['id_usuario'];
+$conexion = new mysqli("localhost", "root", "", "base_proyecto");
+
+// Obtener la suma de todos los presupuestos
+$sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + servicios + transporte + vivienda) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
+$resultadoSuma = $conexion->query($sqlSuma);
+$sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +19,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Dashboard - NiceAdmin Bootstrap Template</title>
+  <title>SmartSpends</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -359,7 +373,7 @@
                   <div class="row">
 
                       <!-- Sales Card -->
-                      <div class="col-xxl-4 col-md-6">
+                      <div class="col-xxl-4 col-xl-4 col-md-4">
                           <div class="card info-card sales-card">
 
                               <div class="filter">
@@ -394,7 +408,7 @@
                       </div><!-- End Sales Card -->
 
                       <!-- Revenue Card -->
-                      <div class="col-xxl-4 col-md-6">
+                      <div class="col-xxl-4 col-xl-4 col-md-4">
                           <div class="card info-card revenue-card">
 
                               <div class="filter">
@@ -411,16 +425,14 @@
                               </div>
 
                               <div class="card-body">
-                                  <h5 class="card-title">Revenue <span>| This Month</span></h5>
+                                  <h5 class="card-title">Presupuesto <span>| Esta Semana</span></h5>
 
                                   <div class="d-flex align-items-center">
                                       <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                           <i class="bi bi-currency-dollar"></i>
                                       </div>
                                       <div class="ps-3">
-                                          <h6>$3,264</h6>
-                                          <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
+                                          <h6>$<?php echo number_format($sumaTotal, 2); ?></h6>
                                       </div>
                                   </div>
                               </div>
@@ -429,7 +441,7 @@
                       </div><!-- End Revenue Card -->
 
                       <!-- Customers Card -->
-                      <div class="col-xxl-4 col-xl-6">
+                      <div class="col-xxl-4 col-xl-4 col-md-4">
 
                           <div class="card info-card customers-card">
 
@@ -863,12 +875,9 @@
                               <li><a class="dropdown-item" href="#">This Year</a></li>
                           </ul>
                       </div>
-
                       <div class="card-body pb-0">
                           <h5 class="card-title">Website Traffic <span>| Today</span></h5>
-
                           <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
-
                           <script>
                               document.addEventListener("DOMContentLoaded", () => {
                                   echarts.init(document.querySelector("#trafficChart")).setOption({
@@ -923,13 +932,10 @@
                                   });
                               });
                           </script>
-
                       </div>
                   </div><!-- End Website Traffic -->
               </div>
-
           </div><!-- End News & Updates -->
-
           </div>
           </div>
       </section>

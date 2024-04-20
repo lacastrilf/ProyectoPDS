@@ -6,27 +6,27 @@ if (!isset($_SESSION['id_usuario'])) {
 }
 $idUsuario = $_SESSION['id_usuario'];
 $conexion = new mysqli("localhost", "root", "", "base_proyecto");
-$sql = "SELECT presupuesto FROM colchon WHERE id_usuario='$idUsuario'";
+$sql = "SELECT colchon FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultado = $conexion->query($sql);
 $dato = $resultado->fetch_assoc();
 
 if ($dato) {
-    $_SESSION['presupuesto'] = $dato['presupuesto'];
-    $presupuesto = $dato['presupuesto'];
+    $_SESSION['presupuesto'] = $dato['colchon'];
+    $presupuesto = $dato['colchon'];
 } else {
     $_SESSION['presupuesto'] = 0;
     $presupuesto = 0;
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
     $nuevoPresupuesto = $_POST["presupuesto"];
-    $sql = "SELECT * FROM colchon WHERE id_usuario='$idUsuario'";
+    $sql = "SELECT * FROM presupuestos WHERE id_usuario='$idUsuario'";
     $resultado = $conexion->query($sql);
 
     if ($resultado->num_rows > 0) {
-        $sqlUpdate = "UPDATE colchon SET presupuesto=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
+        $sqlUpdate = "UPDATE presupuestos SET colchon=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
         $conexion->query($sqlUpdate);
     } else {
-        $sqlInsert = "INSERT INTO colchon (id_usuario, presupuesto) VALUES ('$idUsuario', $nuevoPresupuesto)";
+        $sqlInsert = "INSERT INTO presupuestos (id_usuario, colchon) VALUES ('$idUsuario', $nuevoPresupuesto)";
         $conexion->query($sqlInsert);
     }
     $_SESSION['presupuesto'] = $nuevoPresupuesto;
@@ -34,7 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
     header("Location: {$_SERVER['PHP_SELF']}");
     exit;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -416,7 +415,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
               <div class="col-xxl-6 col-md-6">
                   <div class="card info-card revenue-card">
                       <div class="card-body">
-                          <h5 class="card-title">Presupuesto <span>| Este Mes</span></h5>
+                          <h5 class="card-title">Presupuesto <span>| Esta Semana</span></h5>
                           <div class="d-flex align-items-center">
                               <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                   <i class="bi bi-currency-dollar"></i>
@@ -441,7 +440,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
                                                   <form id="formEditarPresupuesto">
                                                       <div class="mb-3">
                                                           <label for="presupuesto">Nuevo Presupuesto:</label>
-                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" required>
+                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" step="any" required>
                                                       </div>
                                                       <button type="submit" class="btn btn-success">Guardar</button>
                                                   </form>

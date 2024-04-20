@@ -6,27 +6,27 @@ if (!isset($_SESSION['id_usuario'])) {
 }
 $idUsuario = $_SESSION['id_usuario'];
 $conexion = new mysqli("localhost", "root", "", "base_proyecto");
-$sql = "SELECT presupuesto FROM transporte WHERE id_usuario='$idUsuario'";
+$sql = "SELECT transporte FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultado = $conexion->query($sql);
 $dato = $resultado->fetch_assoc();
 
 if ($dato) {
-    $_SESSION['presupuesto'] = $dato['presupuesto'];
-    $presupuesto = $dato['presupuesto'];
+    $_SESSION['presupuesto'] = $dato['transporte'];
+    $presupuesto = $dato['transporte'];
 } else {
     $_SESSION['presupuesto'] = 0;
     $presupuesto = 0;
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
     $nuevoPresupuesto = $_POST["presupuesto"];
-    $sql = "SELECT * FROM transporte WHERE id_usuario='$idUsuario'";
+    $sql = "SELECT * FROM presupuestos WHERE id_usuario='$idUsuario'";
     $resultado = $conexion->query($sql);
 
     if ($resultado->num_rows > 0) {
-        $sqlUpdate = "UPDATE transporte SET presupuesto=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
+        $sqlUpdate = "UPDATE presupuestos SET transporte=$nuevoPresupuesto WHERE id_usuario='$idUsuario'";
         $conexion->query($sqlUpdate);
     } else {
-        $sqlInsert = "INSERT INTO transporte (id_usuario, presupuesto) VALUES ('$idUsuario', $nuevoPresupuesto)";
+        $sqlInsert = "INSERT INTO presupuestos (id_usuario, transporte) VALUES ('$idUsuario', $nuevoPresupuesto)";
         $conexion->query($sqlInsert);
     }
     $_SESSION['presupuesto'] = $nuevoPresupuesto;
@@ -453,7 +453,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
                                                   <form id="formEditarPresupuesto">
                                                       <div class="mb-3">
                                                           <label for="presupuesto">Nuevo Presupuesto:</label>
-                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" required>
+                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" step="any" required>
                                                       </div>
                                                       <button type="submit" class="btn btn-success">Guardar</button>
                                                   </form>

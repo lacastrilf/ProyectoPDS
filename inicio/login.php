@@ -26,6 +26,13 @@ if (isset($_POST['ingresar'])) {
 if(isset($_POST['enviar'])){
     $usuario = $_POST['usuario'];
     $contrasena = $_POST['contrasena'];
+
+    if(empty($usuario) || empty($contrasena)) {
+        echo "<script>alert('Por favor, ingrese tanto usuario como contraseña');</script>";
+        echo "<script>window.location.href='login.php';</script>";
+        exit;
+    }
+
     $perfil = isset($_POST['tipo']) ? $_POST['tipo'] : '';
     if($perfil === 'estudiante' || $perfil === 'hogar'){
         $conexion = new mysqli("localhost","root","","base_proyecto");
@@ -33,17 +40,18 @@ if(isset($_POST['enviar'])){
         $resultado = $conexion->query($sql);
         $dato = $resultado->fetch_assoc();
         if($dato){
-            echo "Lo siento, este usuario ya está registrado, intenta con otro";
+            echo "<script>alert('Lo siento, este usuario ya está registrado, intenta con otro');</script>";
+            echo "<script>window.location.href='login.php';</script>";
         } else {
             $sql2 = "INSERT INTO base_usuario (nombre, contrasena, perfil) VALUES ('$usuario','$contrasena','$perfil')";
             $ejecutar2 = mysqli_query($conexion, $sql2);
             header("location:login.php");
         }
     } else {
-        echo "Perfil no válido";
+        echo "<script>alert('Perfil no valido');</script>";
+        echo "<script>window.location.href='login.php';</script>";
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
