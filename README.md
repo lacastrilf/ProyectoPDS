@@ -1,1 +1,2 @@
-Proyeto de ahorros y manejo del dinero
+Proyecto de ahorros y manejo del dinero
+SmartSpends
