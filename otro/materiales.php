@@ -45,7 +45,7 @@
 
     <div class="d-flex align-items-center justify-content-between">
       <a href="../inicio/index.php" class="logo d-flex align-items-center">
-        <img src="assets/img/logo.png" alt="">
+        <img src="assets/img/favicon.png" alt="">
         <span class="d-none d-lg-block">SmartSpends</span>
       </a>
     </div><!-- End Logo -->
