@@ -49,7 +49,7 @@ $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="d-flex align-items-center justify-content-between">
-      <a href="../inicio/index.php" class="logo d-flex align-items-center">
+      <a href="/ProyectoPDS/inicio/index.php" class="logo d-flex align-items-center">
         <span class="d-none d-lg-block">INICIO</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -315,7 +315,7 @@ $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
       <h1>Resumen</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/ProyectoPDS/inicio/index.php">Inicio</a></li>
+          <li class="breadcrumb-item"><a href="../inicio/index.php">Inicio</a></li>
           <li class="breadcrumb-item active">Resumen</li>
         </ol>
       </nav>

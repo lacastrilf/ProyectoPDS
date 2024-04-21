@@ -106,7 +106,7 @@ $conexion->close();
   <header id="header" class="header fixed-top d-flex align-items-center">
 
       <div class="d-flex align-items-center justify-content-between">
-      <a href="/ProyectoPDS/inicio/index.php" class="logo d-flex align-items-center">
+      <a href="../../inicio/index.php" class="logo d-flex align-items-center">
           <span class="d-none d-lg-block">INICIO</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -338,7 +338,7 @@ $conexion->close();
       <li class="nav-heading">Pages</li>
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="/ProyectoPDS/otro/estudiante.php">
+            <a class="nav-link collapsed" href="../estudiante.php">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>Resumen</span>
             </a>
@@ -373,7 +373,7 @@ $conexion->close();
         </li><!-- End Login Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="/ProyectoPDS/inicio/login.php">
+            <a class="nav-link collapsed" href="../../inicio/login.php">
                 <i class="bi bi-person-bounding-box"></i>
                 <span>Login</span>
             </a>
@@ -388,7 +388,7 @@ $conexion->close();
       <h1>Transporte</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/ProyectoPDS/otro/estudiante.php">Resumen</a></li>
+          <li class="breadcrumb-item"><a href="../estudiante.php">Resumen</a></li>
           <li class="breadcrumb-item active">Transporte</li>
         </ol>
       </nav>

@@ -359,7 +359,7 @@ $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
           <h1>Resumen</h1>
           <nav>
               <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="/ProyectoPDS/inicio/index.php">Home</a></li>
+                  <li class="breadcrumb-item"><a href="../inicio/index.php">Home</a></li>
                   <li class="breadcrumb-item active">Resumen</li>
               </ol>
           </nav>
