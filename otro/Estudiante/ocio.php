@@ -34,7 +34,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
     header("Location: {$_SERVER['PHP_SELF']}");
     exit;
 }
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["gasto"])) {
+    $gasto = $_POST['gasto'];
+    $descripcion = isset($_POST['descripcion']) ? $_POST['descripcion'] : '';
+    $tipo = "Ocio";
 
+    $sqlInsertGasto = "INSERT INTO gastosI (id_usuario, tipo, gasto, descripcion) VALUES (?, ?, ?, ?)";
+    $stmt = $conexion->prepare($sqlInsertGasto);
+    $stmt->bind_param("ssds", $idUsuario, $tipo, $gasto, $descripcion);
+    if ($stmt->execute()) {
+        header("Location: {$_SERVER['PHP_SELF']}");
+        exit;
+    } else {
+        echo "Error al guardar el gasto: " . $conexion->error;
+    }
+}
+
+
+$sql = "SELECT SUM(gasto) AS total_gastos FROM gastosI WHERE id_usuario='$idUsuario' AND tipo='Ocio'";
+$resultado = $conexion->query($sql);
+$totalGastos = 0;
+if ($resultado->num_rows > 0) {
+    $dato = $resultado->fetch_assoc();
+    $totalGastos = $dato['total_gastos'];
+}
+$conexion->close();
 ?>
 
 <!DOCTYPE html>
@@ -383,30 +407,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
             <div class="col-xxl-6 col-md-6">
               <div class="card info-card sales-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Hoy</a></li>
-                    <li><a class="dropdown-item" href="#">este mes</a></li>
-                  </ul>
-                </div>
+                  <div class="filter">
+                      <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirGasto"><i class="bi bi-plus-circle"></i></a>
+                  </div>
+                  <div class="modal fade" id="modalAñadirGasto" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Nuevo Gasto</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                  <form id="formNuevoGasto">
+                                      <div class="mb-3">
+                                          <label for="gasto">Monto:</label>
+                                          <input type="number" class="form-control" id="gasto" name="gasto" required>
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="descripcion">Descripción:</label>
+                                          <input type="text" class="form-control" id="descripcion" name="descripcion" placeholder="Descripción">
+                                      </div>
+                                      <button type="submit" class="btn btn-success">Guardar</button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Gastos realizados <span>| Esta semana</span></h5>
+                  <h5 class="card-title">Gastos realizados</h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-cart"></i>
                     </div>
-                    <div class="ps-3">
-                      <h6>145</h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
-
-                    </div>
+                      <div class="ps-3">
+                          <h6 id="total_gastos" >$<?php echo $totalGastos == 0 ? '0' : $totalGastos; ?></h6></h6>
+                          <span id="porcentaje" class="text-success small pt-1 fw-bold"></span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
+                      </div>
                   </div>
                 </div>
 
@@ -441,7 +479,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
                                                   <form id="formEditarPresupuesto">
                                                       <div class="mb-3">
                                                           <label for="presupuesto">Nuevo Presupuesto:</label>
-                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" step="any"  required>
+                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto"   required>
                                                       </div>
                                                       <button type="submit" class="btn btn-success">Guardar</button>
                                                   </form>
@@ -960,6 +998,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
                   }
               });
           });
+          $('#formNuevoGasto').submit(function(event) {
+              event.preventDefault();
+              var monto = $('#gasto').val();
+              var descripcion = $('#descripcion').val();
+              $.ajax({
+                  url: 'ocio.php',
+                  method: 'POST',
+                  data: { gasto: monto, descripcion: descripcion },
+                  success: function(response) {
+                      alert('Gasto guardado correctamente');
+                      $('#modalAñadirGasto').modal('hide');
+                      var totalActual = parseFloat($('#total_gastos').text().replace('$', ''));
+                      var nuevoTotal = totalActual + parseFloat(monto);
+                      $('#total_gastos').text('$' + nuevoTotal);
+                      actualizarPorcentaje();
+                  },
+                  error: function(xhr, status, error) {
+                      alert('Error al guardar el gasto');
+                      console.error(xhr.responseText);
+                  }
+              });
+          });
+          function actualizarPorcentaje() {
+              var presupuestoTexto = $('#presupuesto_usuario').text().replace('$', '').replace(',', '');
+              var totalGastosTexto = $('#total_gastos').text().replace('$', '').replace(',', '');
+              var presupuesto = parseFloat(presupuestoTexto);
+              var totalGastos = parseFloat(totalGastosTexto);
+              if (!isNaN(presupuesto) && !isNaN(totalGastos) && presupuesto !== 0) {
+                  var porcentaje = (totalGastos / presupuesto) * 100;
+                  $('#porcentaje').text(porcentaje.toFixed(2) + '%');
+              } else {
+                  $('#porcentaje').text('0%');
+              }
+          }
+          actualizarPorcentaje();
       });
   </script>
   <!-- Vendor JS Files -->
