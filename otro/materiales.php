@@ -11,7 +11,7 @@
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="assets/img/favicon.png" rel="favicon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -49,6 +49,7 @@
         <span class="d-none d-lg-block">SmartSpends</span>
       </a>
     </div><!-- End Logo -->
+
   </header><!-- End Header -->
 
 
@@ -99,7 +100,7 @@
                 </div>
 
                 <div>
-                <img src="libroprpp.webp" style="position:absolute; top:0%; right:0%;height: 100%; width: 30%; " alt="...">
+                <img src="assets/img/libroprpp.webp" style="position:absolute; top:0%; right:0%;height: 100%; width: 30%; " alt="...">
                 </div>
 
               </div>
@@ -152,7 +153,7 @@
 
           <!-- Card with an image on top -->
           <div class="card">
-            <img src="elhombre.jpg" class="card-img-top" style="position: absolute;height:70%;" alt="...">
+            <img src="assets/img/elhombre.jpg" class="card-img-top" style="position: absolute;height:70%;" alt="...">
             <div class="card-body">
               <h5 class="card-title"><br><br><br><br><br><br><br><br><br><br><br><br>Libro de educacion financiera</h5>
               <p class="card-text">"El hombre más rico de Babilonia" de George S. Clason: Un libro que ofrece consejos prácticos para ahorrar y hacer crecer tu dinero.</p>
@@ -166,7 +167,7 @@
                 ciera para principantes</h5>
               <p class="card-text">“Pequeño cerdo capitalista” de Sofía Macías: Un libro introductorio a la educación financiera escrito en un lenguaje sencillo y ameno. <br><br><br><br><br><br><br><br><br><br><br><br><br></p>
             </div>
-            <img src="pequenoc.webp" style="position:absolute; top: 40%; height: 60%;"  class="card-img-bottom" alt="...">
+            <img src="assets/img/pequenoc.webp" style="position:absolute; top: 40%; height: 60%;" class="card-img-bottom" alt="...">
           </div><!-- End Card with an image on bottom -->
 
           <div class="card">
@@ -207,7 +208,7 @@
           </div><!-- End Special title treatmen -->
 
           <div class="card">
-            <img src="tud.jpg" class="card-img-top" alt="...">
+            <img src="assets/img/tud.jpg" class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">Podcast sobre Finanzas</h5>
               <p class="card-text">Tu dinero nunca duerme: Dirigido por Luis Fernando Quintero y Manuel Llamas, este podcast se presenta como "el primer programa de cultura financiera de la radio".</p>

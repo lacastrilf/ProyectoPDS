@@ -63,6 +63,9 @@ if(isset($_POST['enviar'])){
 
     <title>SmartSpends</title>
     <link rel="stylesheet" href="stylelogin.css">
+
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/favicon.png" rel="favicon">
 </head>
 <body>
 <div id="container">
