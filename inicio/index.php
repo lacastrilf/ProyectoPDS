@@ -42,9 +42,10 @@
     <div class="container d-flex justify-content-between">
 
       <div class="logo">
-        <a href="index.php"><img src="assets/img/SmartSpends.png" alt="" class="img-fluid"></a>
-      </div>
-
+          <a href="index.php" class="logo d-flex align-items-center">
+              <img src="assets/img/favicon.png" alt="">
+              <span class="d-none d-lg-block" style="font-size: 1.7em; font-weight: bold; font-family: Helvetica, Arial, sans-serif">SmartSpends</span>
+          </a></div>
       <nav id="navbar" class="navbar">
         <ul>
           <li><a class="nav-link scrollto active" href="#hero">Home</a></li>
