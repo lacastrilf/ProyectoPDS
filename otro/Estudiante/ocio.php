@@ -301,7 +301,11 @@ $conexion->close();
                 </div>
 
                 <div class="card-body pb-0">
+<<<<<<< HEAD
                   <h5 class="card-title">Eventos Especiales <span>| Semanales</span></h5>
+=======
+                  <h5 class="card-title">Top Selling <span>| Today</span></h5>
+>>>>>>> 641521837e1fffab06b8b020bf925a047791e484
 
                   <table class="table table-borderless">
                     <thead>
@@ -313,6 +317,7 @@ $conexion->close();
                       </tr>
                     </thead>
                     <tbody>
+<<<<<<< HEAD
 
                     <?php
                     $conexion = new mysqli("localhost", "root", "", "base_proyecto");
@@ -336,6 +341,14 @@ $conexion->close();
                     }
 
                     ?>
+=======
+                      <tr>
+                        <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
+                        <td>$64</td>
+                        <td class="fw-bold">124</td>
+                        <td>$5,828</td>
+                      </tr>
+>>>>>>> 641521837e1fffab06b8b020bf925a047791e484
                       
                     </tbody>
                   </table>
@@ -354,7 +367,11 @@ $conexion->close();
                                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div class="modal-body">
+<<<<<<< HEAD
                                   <form action="ocio.php" method="POST">
+=======
+                                  <form id="formNuevoGasto">
+>>>>>>> 641521837e1fffab06b8b020bf925a047791e484
                                       <div class="mb-3">
                                           <label for="gasto">Evento:</label>
                                           <input type="text" class="form-control" id="gasto" name="nombreEvento" required>
