@@ -122,7 +122,7 @@
           <div class="card mb-3">
             <div class="row g-0">
               <div class="col-md-4">
-                <a href="https://www.youtube.com/watch?v=hZweLjSVoqU"><img src="ahorro.jpg" class="img-fluid rounded-start" alt="..."></a>
+                <a href="https://www.youtube.com/watch?v=hZweLjSVoqU"><img src="assets/img/ahorro.jpg" class="img-fluid rounded-start" alt="..."></a>
               </div>
               <div class="col-md-8">
                 <div class="card-body">
