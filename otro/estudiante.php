@@ -375,7 +375,7 @@ $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
                       <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>$<?php echo number_format($sumaTotal, 2); ?></h6>
+                      <h6>$<?php echo $sumaTotal ?></h6>
                       </div>
                   </div>
                 </div>
