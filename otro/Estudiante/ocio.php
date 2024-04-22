@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["gasto"])) {
     }
 }
 
-
+//Generar total gastos
 $sql = "SELECT SUM(gasto) AS total_gastos FROM gastosI WHERE id_usuario='$idUsuario' AND tipo='Ocio'";
 $resultado = $conexion->query($sql);
 $totalGastos = 0;
@@ -58,6 +58,12 @@ if ($resultado->num_rows > 0) {
     $dato = $resultado->fetch_assoc();
     $totalGastos = $dato['total_gastos'];
 }
+
+//Cambiar total de gastos en la base de datos
+$sqlUpdate="UPDATE diagramagastosestudiante SET ocio=$totalGastos WHERE idUsuario=$idUsuario";
+$ejecutar3 = mysqli_query($conexion, $sqlUpdate);
+
+
 
 //Ingresar a la base de datos los eventos especiales 
 if(isset($_POST['agregarEvento'])){
@@ -313,6 +319,7 @@ $conexion->close();
                       </tr>
                     </thead>
                     <tbody>
+
                     <?php
                     $conexion = new mysqli("localhost", "root", "", "base_proyecto");
                     $sqlGetEventos = "SELECT * FROM eventosespeciales WHERE idUsuario='$idUsuario'";
@@ -335,6 +342,7 @@ $conexion->close();
                     }
 
                     ?>
+
                     </tbody>
                   </table>
 
@@ -354,6 +362,8 @@ $conexion->close();
                               <div class="modal-body">
                                   <form action="ocio.php" method="POST">
                                   <form id="formNuevoGasto">
+
+                                  <form action="ocio.php" method="POST">
                                       <div class="mb-3">
                                           <label for="gasto">Evento:</label>
                                           <input type="text" class="form-control" id="gasto" name="nombreEvento" required>
@@ -371,7 +381,8 @@ $conexion->close();
                               </div>
                           </div>
                       </div>
-                  </div>
+              </div>
+              <!-- End Model Añadir Evento -->
 
             <!-- Reports -->
             <div class="col-12">

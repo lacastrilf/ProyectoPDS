@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["gasto"])) {
     }
 }
 
-
+//Generar total de gastos 
 $sql = "SELECT SUM(gasto) AS total_gastos FROM gastosI WHERE id_usuario='$idUsuario' AND tipo='Transporte'";
 $resultado = $conexion->query($sql);
 $totalGastos = 0;
@@ -57,6 +57,12 @@ if ($resultado->num_rows > 0) {
     $dato = $resultado->fetch_assoc();
     $totalGastos = $dato['total_gastos'];
 }
+
+//Cambiar total de gastos en la base de datos
+$sqlUpdate = "UPDATE diagramagastosestudiante SET transporte =$totalGastos WHERE idUsuario = $idUsuario";
+$ejecutar3 = mysqli_query($conexion, $sqlUpdate);
+
+
 $conexion->close();
 ?>
 

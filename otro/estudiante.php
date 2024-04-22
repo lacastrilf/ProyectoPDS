@@ -7,11 +7,39 @@ if (!isset($_SESSION['id_usuario'])) {
 $idUsuario = $_SESSION['id_usuario'];
 $conexion = new mysqli("localhost", "root", "", "base_proyecto");
 
-// Obtener la suma de todos los presupuestos
+//Obtener la suma de todos los presupuestos
 $sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + servicios + transporte + vivienda) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultadoSuma = $conexion->query($sqlSuma);
 $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
+
+//Creación de fila de la tabla diagrama Costos de estudiantes
+$sqlSeleccion= "SELECT * FROM diagramagastosestudiante WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccion);
+$dato = $resultado->fetch_assoc();
+$ejecutar2 = mysqli_query($conexion, $sqlSeleccion);
+if($dato){
+  $alimentacionGrafico=$dato['alimentacion'];
+  $transporteGrafico=$dato['transporte'];
+  $ocioGrafico=$dato['ocio'];
+}
+else{
+  $sqlIngresar="INSERT INTO diagramagastosestudiante VALUES ('null', '$idUsuario', '0', '0', '0')";
+  $ejecutar3 = mysqli_query($conexion, $sqlIngresar);
+}
+
+//Ingresar pendientes de la semana
+if(isset($_POST['enviarPendiente'])){
+  $nombrePendiente=$_POST['nombrePendiente']; 
+  $presupuestoPendiente=$_POST['montoPendiente']; 
+  $fechaPendiente=$_POST['fechaPendiente']; 
+  $sqlInsertPendiente = "INSERT INTO  pendiente VALUES ('null','$idUsuario','$nombrePendiente','$presupuestoPendiente','$fechaPendiente')";
+  $ejecutar3 = mysqli_query($conexion, $sqlInsertPendiente);
+}
+
+//Sacar datos para gráficos
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -411,7 +439,200 @@ $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
             </div>
           </div>
         </div>
-             <!-- End Customers Card -->
+         
+
+        <div class="row">
+            <div class="col-lg-4">
+          <div class="card">
+            <div class="filter">
+            <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirPendientes"><i class="bi bi-plus-circle"></i></a>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Recent Activity <span>| Today</span></h5>
+              <div class="activity">
+
+                
+                <?php
+                $sqlGetEventos = "SELECT * FROM pendiente WHERE idUsuario='$idUsuario'";
+                $resultado=mysqli_query($conexion, $sqlGetEventos);
+                if($resultado){
+                  while($row = $resultado->fetch_array()){
+                    $nombrePendiente=$row['nombre'];
+                    $montoPendiente=$row['precio'];
+                    $fechaPendiente=$row['fecha'];
+                 
+                ?>
+                  <div class="activity-item d-flex" >
+                  <div class="activite-label"><?php echo($fechaPendiente); ?><br><b>$<?php echo($montoPendiente); ?></b></div>
+                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
+                  <div class="activity-content"><?php echo($nombrePendiente); ?> </div>
+                 
+                </div><!-- End activity item-->
+                <?php
+                   }
+                }
+
+                ?>
+                
+             
+         
+              </div>
+              </div>
+            </div>
+          </div><!-- End Recent Activity -->
+
+
+          <div class="col-lg-4">
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filter</h6>
+                </li>
+                <li><a class="dropdown-item" href="#">Today</a></li>
+                <li><a class="dropdown-item" href="#">This Month</a></li>
+                <li><a class="dropdown-item" href="#">This Year</a></li>
+              </ul>
+            </div>
+            <div class="card-body pb-0">
+              <h5 class="card-title">Budget Report <span>| This Month</span></h5>
+              <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
+              <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                  var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
+                    legend: {
+                      data: ['Allocated Budget', 'Actual Spending']
+                    },
+                    radar: {
+                      // shape: 'circle',
+                      indicator: [{
+                          name: 'Sales',
+                          max: 6500
+                        },
+                        {
+                          name: 'Administration',
+                          max: 16000
+                        },
+                        {
+                          name: 'Information Technology',
+                          max: 30000
+                        },
+                        {
+                          name: 'Customer Support',
+                          max: 38000
+                        },
+                        {
+                          name: 'Development',
+                          max: 52000
+                        },
+                        {
+                          name: 'Marketing',
+                          max: 25000
+                        }
+                      ]
+                    },
+                    series: [{
+                      name: 'Budget vs spending',
+                      type: 'radar',
+                      data: [{
+                          value: [4200, 3000, 20000, 35000, 50000, 18000],
+                          name: 'Allocated Budget'
+                        },
+                        {
+                          value: [5000, 14000, 28000, 26000, 42000, 21000],
+                          name: 'Actual Spending'
+                        }
+                      ]
+                    }]
+                  });
+                });
+              </script>
+            </div>
+          </div><!-- End Budget Report -->
+        </div>
+            <div class="col-lg-4">
+          <!-- Website Traffic -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filter</h6>
+                </li>
+                <li><a class="dropdown-item" href="#">Today</a></li>
+                <li><a class="dropdown-item" href="#">This Month</a></li>
+                <li><a class="dropdown-item" href="#">This Year</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body pb-0">
+              <h5 class="card-title">Gráficas Gastos <span>| Semanales</span></h5>
+              <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
+              <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                  echarts.init(document.querySelector("#trafficChart")).setOption({
+                    tooltip: {
+                      trigger: 'item'
+                    },
+                    legend: {
+                      top: '5%',
+                      left: 'center'
+                    },
+                    series: [{
+                      name: 'Access From',
+                      type: 'pie',
+                      radius: ['40%', '70%'],
+                      avoidLabelOverlap: false,
+                      label: {
+                        show: false,
+                        position: 'center'
+                      },
+                      emphasis: {
+                        label: {
+                          show: true,
+                          fontSize: '18',
+                          fontWeight: 'bold'
+                        }
+                      },
+                      labelLine: {
+                        show: false
+                      },
+                      data: [{
+                          value: <?php echo ($alimentacionGrafico);?>,
+                          name: 'Transporte'
+                        },
+                        {
+                          value: <?php echo ($transporteGrafico);?>,
+                          name: 'Alimentación'
+                        },
+                        {
+                          value:<?php echo ($ocioGrafico);?>,
+                          name: 'Ocio'
+                        },
+                        
+                      ]
+                    }]
+                  });
+                });
+              </script>
+            </div>
+          </div><!-- End Website Traffic -->
+            </div>
+
+            <div>
+          <form action="estudiante.php" method="POST">
+          <label>Pendiente</label><br>
+          <input type="text" name="nombrePendiente"><br>
+          <label>Monto</label><br>
+          <input type="number" name="montoPendiente"><br>
+          <label>Fecha</label><br>
+          <input type="date" name="fechaPendiente"><br>
+          <input type="submit" name="enviarPendiente" value="Guardar">
+        </form>
+        </div>
+
+                <!-- End Customers Card -->
             <!-- Reports -->
             <div class="col-12">
               <div class="card">
@@ -622,215 +843,6 @@ $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
             </div><!-- End Top Selling -->
           </div>
         </div><!-- End Left side columns -->
-
-        <div class="row">
-            <div class="col-lg-4">
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-            <div class="card-body">
-              <h5 class="card-title">Recent Activity <span>| Today</span></h5>
-              <div class="activity">
-                <div class="activity-item d-flex">
-                  <div class="activite-label">32 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                  <div class="activity-content">
-                    Quia quae rerum <a href="#" class="fw-bold text-dark">explicabo officiis</a> beatae
-                  </div>
-                </div><!-- End activity item-->
-                <div class="activity-item d-flex">
-                  <div class="activite-label">56 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
-                  <div class="activity-content">
-                    Voluptatem blanditiis blanditiis eveniet
-                  </div>
-                </div><!-- End activity item-->
-                <div class="activity-item d-flex">
-                  <div class="activite-label">2 hrs</div>
-                  <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
-                  <div class="activity-content">
-                    Voluptates corrupti molestias voluptatem
-                  </div>
-                </div><!-- End activity item-->
-                <div class="activity-item d-flex">
-                  <div class="activite-label">1 day</div>
-                  <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
-                  <div class="activity-content">
-                    Tempore autem saepe <a href="#" class="fw-bold text-dark">occaecati voluptatem</a> tempore
-                  </div>
-                </div><!-- End activity item-->
-                <div class="activity-item d-flex">
-                  <div class="activite-label">2 days</div>
-                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                  <div class="activity-content">
-                    Est sit eum reiciendis exercitationem
-                  </div>
-                </div><!-- End activity item-->
-                <div class="activity-item d-flex">
-                  <div class="activite-label">4 weeks</div>
-                  <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
-                  <div class="activity-content">
-                    Dicta dolorem harum nulla eius. Ut quidem quidem sit quas
-                  </div>
-                </div><!-- End activity item-->
-              </div>
-              </div>
-            </div>
-          </div><!-- End Recent Activity -->
-
-          <div class="col-lg-4">
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-            <div class="card-body pb-0">
-              <h5 class="card-title">Budget Report <span>| This Month</span></h5>
-              <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
-                    legend: {
-                      data: ['Allocated Budget', 'Actual Spending']
-                    },
-                    radar: {
-                      // shape: 'circle',
-                      indicator: [{
-                          name: 'Sales',
-                          max: 6500
-                        },
-                        {
-                          name: 'Administration',
-                          max: 16000
-                        },
-                        {
-                          name: 'Information Technology',
-                          max: 30000
-                        },
-                        {
-                          name: 'Customer Support',
-                          max: 38000
-                        },
-                        {
-                          name: 'Development',
-                          max: 52000
-                        },
-                        {
-                          name: 'Marketing',
-                          max: 25000
-                        }
-                      ]
-                    },
-                    series: [{
-                      name: 'Budget vs spending',
-                      type: 'radar',
-                      data: [{
-                          value: [4200, 3000, 20000, 35000, 50000, 18000],
-                          name: 'Allocated Budget'
-                        },
-                        {
-                          value: [5000, 14000, 28000, 26000, 42000, 21000],
-                          name: 'Actual Spending'
-                        }
-                      ]
-                    }]
-                  });
-                });
-              </script>
-            </div>
-          </div><!-- End Budget Report -->
-        </div>
-            <div class="col-lg-4">
-          <!-- Website Traffic -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-
-            <div class="card-body pb-0">
-              <h5 class="card-title">Website Traffic <span>| Today</span></h5>
-              <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  echarts.init(document.querySelector("#trafficChart")).setOption({
-                    tooltip: {
-                      trigger: 'item'
-                    },
-                    legend: {
-                      top: '5%',
-                      left: 'center'
-                    },
-                    series: [{
-                      name: 'Access From',
-                      type: 'pie',
-                      radius: ['40%', '70%'],
-                      avoidLabelOverlap: false,
-                      label: {
-                        show: false,
-                        position: 'center'
-                      },
-                      emphasis: {
-                        label: {
-                          show: true,
-                          fontSize: '18',
-                          fontWeight: 'bold'
-                        }
-                      },
-                      labelLine: {
-                        show: false
-                      },
-                      data: [{
-                          value: 1048,
-                          name: 'Search Engine'
-                        },
-                        {
-                          value: 735,
-                          name: 'Direct'
-                        },
-                        {
-                          value: 580,
-                          name: 'Email'
-                        },
-                        {
-                          value: 484,
-                          name: 'Union Ads'
-                        },
-                        {
-                          value: 300,
-                          name: 'Video Ads'
-                        }
-                      ]
-                    }]
-                  });
-                });
-              </script>
-            </div>
-          </div><!-- End Website Traffic -->
-            </div>
           </div><!-- End News & Updates -->
     </div>
       </div>
