@@ -58,6 +58,15 @@ if ($resultado->num_rows > 0) {
     $dato = $resultado->fetch_assoc();
     $totalGastos = $dato['total_gastos'];
 }
+
+if(isset($_POST['agregarEvento'])){
+    $nombreEvento=$_POST['nombreEvento'];
+    $presupuestoEvento=$_POST['montoEvento'];
+    $fecha=$_POST['fechaEvento'];
+    $sqlInsertEvento = "INSERT INTO eventosespeciales VALUES ('null','$idUsuario','$nombreEvento','$presupuestoEvento','$fecha')";
+    $ejecutar3 = mysqli_query($conexion, $sqlInsertEvento);
+    header("Location: {$_SERVER['PHP_SELF']}");
+}
 $conexion->close();
 ?>
 
@@ -505,6 +514,84 @@ $conexion->close();
 
               </div>
             </div><!-- End Revenue Card -->
+              <div class="col-12">
+                  <div class="card top-selling overflow-auto">
+
+                      <div class="filter">
+                          <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirEvento"><i class="bi bi-plus-circle"></i></a>
+                      </div>
+
+                      <div class="card-body pb-0">
+                          <h5 class="card-title">Eventos Especiales <span>| Semanales</span></h5>
+                          <table class="table table-borderless">
+                              <thead>
+                              <tr>
+                                  <th scope="col">Evento</th>
+                                  <th scope="col">Presupuesto</th>
+                                  <th scope="col">Fecha</th>
+                                  <th scope="col">Estado</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <?php
+                              $conexion = new mysqli("localhost", "root", "", "base_proyecto");
+                              $sqlGetEventos = "SELECT * FROM eventosespeciales WHERE idUsuario='$idUsuario'";
+                              $resultado=mysqli_query($conexion, $sqlGetEventos);
+                              if($resultado){
+                                  while($row = $resultado->fetch_array()){
+                                      $nombreEvento=$row['nombreEvento'];
+                                      $montoEvento=$row['precio'];
+                                      $fecha=$row['fecha'];
+
+                                      ?>
+                                      <tr>
+                                          <td><?php echo($nombreEvento)?></td>
+                                          <td>$<?php echo($montoEvento)?></td>
+                                          <td class="fw-bold"><?php echo($fecha)?></td>
+                                          <td>Pendiente</td>
+                                      </tr>
+                                      <?php
+                                  }
+                              }
+
+                              ?>
+                              </tbody>
+                          </table>
+
+                      </div>
+
+                  </div>
+              </div><!-- End Top Selling -->
+
+              <!--Modal Añadir Eventos-->
+              <div class="modal fade" id="modalAñadirEvento" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Nuevo Gasto</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                              <form action="ocio.php" method="POST">
+                                  <form id="formNuevoGasto">
+                                      <div class="mb-3">
+                                          <label for="gasto">Evento:</label>
+                                          <input type="text" class="form-control" id="gasto" name="nombreEvento" required>
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="descripcion">Monto:</label>
+                                          <input type="number" class="form-control" id="descripcion" name="montoEvento" placeholder="Descripción">
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="descripcion">Fecha:</label>
+                                          <input type="date" class="form-control" id="descripcion" name="fechaEvento" placeholder="Descripción">
+                                      </div>
+                                      <button type="submit" class="btn btn-success" name="agregarEvento">Guardar</button>
+                                  </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
 
             <!-- Reports -->
             <div class="col-12">
