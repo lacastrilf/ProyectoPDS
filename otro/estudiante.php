@@ -473,8 +473,33 @@ if(isset($_POST['enviarPendiente'])){
                 }
 
                 ?>
-                
-             
+                  <div class="modal fade" id="modalAñadirPendientes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Añadir pendiente</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                          <form action="estudiante.php" method="POST">
+                                              <div class="mb-3">
+                                                  <label for="pendiente">Pendiente:</label>
+                                                  <input type="text" class="form-control" id="pendiente" name="nombrePendiente" required>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label for="monto">Monto:</label>
+                                                  <input type="number" class="form-control" id="monto" name="montoPendiente" placeholder="Monto">
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label for="descripcion">Fecha:</label>
+                                                  <input type="date" class="form-control" id="descripcion" name="fechaPendiente">
+                                              </div>
+                                              <button type="submit" class="btn btn-success" name="enviarPendiente">Guardar</button>
+                                          </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
          
               </div>
               </div>
@@ -620,17 +645,7 @@ if(isset($_POST['enviarPendiente'])){
           </div><!-- End Website Traffic -->
             </div>
 
-            <div>
-          <form action="estudiante.php" method="POST">
-          <label>Pendiente</label><br>
-          <input type="text" name="nombrePendiente"><br>
-          <label>Monto</label><br>
-          <input type="number" name="montoPendiente"><br>
-          <label>Fecha</label><br>
-          <input type="date" name="fechaPendiente"><br>
-          <input type="submit" name="enviarPendiente" value="Guardar">
-        </form>
-        </div>
+
 
                 <!-- End Customers Card -->
             <!-- Reports -->

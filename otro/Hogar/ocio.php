@@ -528,7 +528,7 @@ $conexion->close();
                 </div>
 
                 <div class="card-body pb-0">
-                  <h5 class="card-title">Eventos Especiales <span>| Semanales</span></h5>
+                  <h5 class="card-title">Eventos Especiales <span>| Esta Semana</span></h5>
 
                   <table class="table table-borderless">
                     <thead>
