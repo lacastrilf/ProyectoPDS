@@ -60,20 +60,13 @@ if ($resultado->num_rows > 0) {
     $totalGastos = $dato['total_gastos'];
 }
 
-
-//Cambiar total de gastos en la base de datos
-$sqlUpdate="UPDATE diagramagastoshogar SET ocio='$totalGastos' WHERE idUsuario='$idUsuario'";
-$ejecutar3 = mysqli_query($conexion, $sqlUpdate);
-
-
-
-//Ingresar a la base de datos los eventos especiales 
 if(isset($_POST['agregarEvento'])){
-  $nombreEvento=$_POST['nombreEvento'];
-  $presupuestoEvento=$_POST['montoEvento'];
-  $fecha=$_POST['fechaEvento'];
-  $sqlInsertEvento = "INSERT INTO eventosespeciales VALUES ('null','$idUsuario','$nombreEvento','$presupuestoEvento','$fecha')";
-  $ejecutar3 = mysqli_query($conexion, $sqlInsertEvento);
+    $nombreEvento=$_POST['nombreEvento'];
+    $presupuestoEvento=$_POST['montoEvento'];
+    $fecha=$_POST['fechaEvento'];
+    $sqlInsertEvento = "INSERT INTO eventosespeciales VALUES ('null','$idUsuario','$nombreEvento','$presupuestoEvento','$fecha')";
+    $ejecutar3 = mysqli_query($conexion, $sqlInsertEvento);
+    header("Location: {$_SERVER['PHP_SELF']}");
 }
 $conexion->close();
 ?>
@@ -522,6 +515,9 @@ $conexion->close();
 
               </div>
             </div><!-- End Revenue Card -->
+              
+
+        
 
             <!-- Top Selling -->
             <div class="col-12">

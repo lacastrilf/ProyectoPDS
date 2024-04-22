@@ -72,6 +72,7 @@ if(isset($_POST['agregarEvento'])){
   $fecha=$_POST['fechaEvento'];
   $sqlInsertEvento = "INSERT INTO eventosespeciales VALUES ('null','$idUsuario','$nombreEvento','$presupuestoEvento','$fecha')";
   $ejecutar3 = mysqli_query($conexion, $sqlInsertEvento);
+    header("Location: {$_SERVER['PHP_SELF']}");
 }
 
 
@@ -308,7 +309,6 @@ $conexion->close();
 
                 <div class="card-body pb-0">
                   <h5 class="card-title">Eventos Especiales <span>| Semanales</span></h5>
-
                   <table class="table table-borderless">
                     <thead>
                       <tr>
@@ -329,7 +329,7 @@ $conexion->close();
                         $nombreEvento=$row['nombreEvento'];
                         $montoEvento=$row['precio'];
                         $fecha=$row['fecha'];
-                     
+
                     ?>
                       <tr>
                         <td><?php echo($nombreEvento)?></td>
@@ -342,9 +342,7 @@ $conexion->close();
                     }
 
                     ?>
-                    
 
-                      
                     </tbody>
                   </table>
 
@@ -362,9 +360,10 @@ $conexion->close();
                                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div class="modal-body">
+                                  <form action="ocio.php" method="POST">
+                                  <form id="formNuevoGasto">
 
                                   <form action="ocio.php" method="POST">
-                      
                                       <div class="mb-3">
                                           <label for="gasto">Evento:</label>
                                           <input type="text" class="form-control" id="gasto" name="nombreEvento" required>
