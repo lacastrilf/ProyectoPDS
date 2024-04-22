@@ -15,16 +15,16 @@ $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
 //Creación de fila de la tabla diagrama Costos de estudiantes
 $sqlSeleccion= "SELECT * FROM diagramagastosestudiante WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccion);
+if ($resultado->num_rows == 0) {
+    $sqlIngresar="INSERT INTO diagramagastosestudiante VALUES ('null', '$idUsuario', '0', '0', '0')";
+    $ejecutar3 = mysqli_query($conexion, $sqlIngresar);
+}
+$resultado = $conexion->query($sqlSeleccion);
 $dato = $resultado->fetch_assoc();
-$ejecutar2 = mysqli_query($conexion, $sqlSeleccion);
 if($dato){
   $alimentacionGrafico=$dato['alimentacion'];
   $transporteGrafico=$dato['transporte'];
   $ocioGrafico=$dato['ocio'];
-}
-else{
-  $sqlIngresar="INSERT INTO diagramagastosestudiante VALUES ('null', '$idUsuario', '0', '0', '0')";
-  $ejecutar3 = mysqli_query($conexion, $sqlIngresar);
 }
 
 //Ingresar pendientes de la semana
@@ -34,9 +34,8 @@ if(isset($_POST['enviarPendiente'])){
   $fechaPendiente=$_POST['fechaPendiente']; 
   $sqlInsertPendiente = "INSERT INTO  pendiente VALUES ('null','$idUsuario','$nombrePendiente','$presupuestoPendiente','$fechaPendiente')";
   $ejecutar3 = mysqli_query($conexion, $sqlInsertPendiente);
+    header("Location: {$_SERVER['PHP_SELF']}");
 }
-
-//Sacar datos para gráficos
 
 ?>
 

@@ -13,20 +13,20 @@ $resultadoSuma = $conexion->query($sqlSuma);
 $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
 
 //Creación de fila de la tabla diagrama Costos del Hogar
-$sqlSeleccion= "SELECT * FROM diagramagastoshogar WHERE idUsuario = '$idUsuario'";
+$sqlSeleccion = "SELECT * FROM diagramagastoshogar WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccion);
+if ($resultado->num_rows == 0) {
+    $sqlIngresar = "INSERT INTO diagramagastoshogar VALUES ('null', '$idUsuario', '0', '0', '0', '0', '0')";
+    $ejecutar3 = mysqli_query($conexion, $sqlIngresar);
+}
 $resultado = $conexion->query($sqlSeleccion);
 $dato = $resultado->fetch_assoc();
-$ejecutar2 = mysqli_query($conexion, $sqlSeleccion);
 if($dato){
   $alimentacionGrafico=$dato['alimentacion'];
   $transporteGrafico=$dato['transporte'];
   $serviciosGrafico=$dato['servicios'];
   $viviendaGrafico=$dato['vivienda'];
   $ocioGrafico=$dato['ocio'];
-}
-else{
-  $sqlIngresar="INSERT INTO diagramagastoshogar VALUES ('null', '$idUsuario', '0', '0', '0','0','0')";
-  $ejecutar3 = mysqli_query($conexion, $sqlIngresar);
 }
 
 
@@ -37,6 +37,7 @@ if(isset($_POST['enviarPendiente'])){
     $fechaPendiente=$_POST['fechaPendiente']; 
     $sqlInsertPendiente = "INSERT INTO  pendiente VALUES ('null','$idUsuario','$nombrePendiente','$presupuestoPendiente','$fechaPendiente')";
     $ejecutar3 = mysqli_query($conexion, $sqlInsertPendiente);
+    header("Location: {$_SERVER['PHP_SELF']}");
 }
 ?>
 <!DOCTYPE html>
