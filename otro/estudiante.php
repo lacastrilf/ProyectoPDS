@@ -463,7 +463,7 @@ if(isset($_POST['enviarPendiente'])){
                  
                 ?>
                   <div class="activity-item d-flex" >
-                  <div class="activite-label"><?php echo($fechaPendiente); ?><br><b>$<?php echo($montoPendiente); ?></b></div>
+                  <div class="activite-label"><?php echo($fechaPendiente); ?><br><b> <p>$<?php echo($montoPendiente); ?></p></b></div>
                   <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
                   <div class="activity-content"><?php echo($nombrePendiente); ?> </div>
                  
@@ -599,11 +599,11 @@ if(isset($_POST['enviarPendiente'])){
                         show: false
                       },
                       data: [{
-                          value: <?php echo ($alimentacionGrafico);?>,
+                          value: <?php echo ($transporteGrafico);?>,
                           name: 'Transporte'
                         },
                         {
-                          value: <?php echo ($transporteGrafico);?>,
+                          value: <?php echo ($alimentacionGrafico);?>,
                           name: 'Alimentación'
                         },
                         {

@@ -59,7 +59,7 @@ if ($resultado->num_rows > 0) {
 }
 
 //Cambiar total de gastos en la base de datos
-$sqlUpdate = "UPDATE diagramagastosestudiante SET transporte =$totalGastos WHERE idUsuario = $idUsuario";
+$sqlUpdate = "UPDATE diagramagastosestudiante SET transporte ='$totalGastos' WHERE idUsuario = '$idUsuario'";
 $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
 
 

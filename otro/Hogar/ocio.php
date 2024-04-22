@@ -51,12 +51,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["gasto"])) {
 }
 
 
+//Generar total de gastos
 $sql = "SELECT SUM(gasto) AS total_gastos FROM gastosI WHERE id_usuario='$idUsuario' AND tipo='Ocio'";
 $resultado = $conexion->query($sql);
 $totalGastos = 0;
 if ($resultado->num_rows > 0) {
     $dato = $resultado->fetch_assoc();
     $totalGastos = $dato['total_gastos'];
+}
+
+
+//Cambiar total de gastos en la base de datos
+$sqlUpdate="UPDATE diagramagastoshogar SET ocio='$totalGastos' WHERE idUsuario='$idUsuario'";
+$ejecutar3 = mysqli_query($conexion, $sqlUpdate);
+
+
+
+//Ingresar a la base de datos los eventos especiales 
+if(isset($_POST['agregarEvento'])){
+  $nombreEvento=$_POST['nombreEvento'];
+  $presupuestoEvento=$_POST['montoEvento'];
+  $fecha=$_POST['fechaEvento'];
+  $sqlInsertEvento = "INSERT INTO eventosespeciales VALUES ('null','$idUsuario','$nombreEvento','$presupuestoEvento','$fecha')";
+  $ejecutar3 = mysqli_query($conexion, $sqlInsertEvento);
 }
 $conexion->close();
 ?>
@@ -506,6 +523,91 @@ $conexion->close();
               </div>
             </div><!-- End Revenue Card -->
 
+            <!-- Top Selling -->
+            <div class="col-12">
+              <div class="card top-selling overflow-auto">
+
+                <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirEvento"><i class="bi bi-plus-circle"></i></a>
+                </div>
+
+                <div class="card-body pb-0">
+                  <h5 class="card-title">Eventos Especiales <span>| Semanales</span></h5>
+
+                  <table class="table table-borderless">
+                    <thead>
+                      <tr>
+                      <th scope="col">Evento</th>
+                        <th scope="col">Presupuesto</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      
+                    <?php
+                    $conexion = new mysqli("localhost", "root", "", "base_proyecto");
+                    $sqlGetEventos = "SELECT * FROM eventosespeciales WHERE idUsuario='$idUsuario'";
+                    $resultado=mysqli_query($conexion, $sqlGetEventos);
+                    if($resultado){
+                      while($row = $resultado->fetch_array()){
+                        $nombreEvento=$row['nombreEvento'];
+                        $montoEvento=$row['precio'];
+                        $fecha=$row['fecha'];
+                     
+                    ?>
+                      <tr>
+                        <td><?php echo($nombreEvento)?></td>
+                        <td>$<?php echo($montoEvento)?></td>
+                        <td class="fw-bold"><?php echo($fecha)?></td>
+                        <td>Pendiente</td>
+                      </tr>
+                    <?php
+                       }
+                    }
+
+                    ?>
+
+                    </tbody>
+                  </table>
+
+                </div>
+
+              </div>
+            </div><!-- End Top Selling -->
+
+             <!--Modal Añadir Eventos-->
+             <div class="modal fade" id="modalAñadirEvento" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Nuevo Gasto</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+
+                                  <form action="ocio.php" method="POST">
+                      
+                                      <div class="mb-3">
+                                          <label for="gasto">Evento:</label>
+                                          <input type="text" class="form-control" id="gasto" name="nombreEvento" required>
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="descripcion">Monto:</label>
+                                          <input type="number" class="form-control" id="descripcion" name="montoEvento" placeholder="Descripción">
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="descripcion">Fecha:</label>
+                                          <input type="date" class="form-control" id="descripcion" name="fechaEvento" placeholder="Descripción">
+                                      </div>
+                                      <button type="submit" class="btn btn-success" name="agregarEvento">Guardar</button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+              </div>
+              <!-- End Model Añadir Evento -->
+
             <!-- Reports -->
             <div class="col-12">
               <div class="card">
@@ -662,79 +764,7 @@ $conexion->close();
               </div>
             </div><!-- End Recent Sales -->
 
-            <!-- Top Selling -->
-            <div class="col-12">
-              <div class="card top-selling overflow-auto">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body pb-0">
-                  <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
-                  <table class="table table-borderless">
-                    <thead>
-                      <tr>
-                        <th scope="col">Preview</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Sold</th>
-                        <th scope="col">Revenue</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-1.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
-                        <td>$64</td>
-                        <td class="fw-bold">124</td>
-                        <td>$5,828</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-2.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
-                        <td>$46</td>
-                        <td class="fw-bold">98</td>
-                        <td>$4,508</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-3.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
-                        <td>$59</td>
-                        <td class="fw-bold">74</td>
-                        <td>$4,366</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-4.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
-                        <td>$32</td>
-                        <td class="fw-bold">63</td>
-                        <td>$2,016</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-5.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
-                        <td>$79</td>
-                        <td class="fw-bold">41</td>
-                        <td>$3,239</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                </div>
-
-              </div>
-            </div><!-- End Top Selling -->
+            
 
           </div>
         </div><!-- End Left side columns -->
@@ -794,21 +824,7 @@ $conexion->close();
                   </div>
                 </div><!-- End activity item-->
 
-                <div class="activity-item d-flex">
-                  <div class="activite-label">2 days</div>
-                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                  <div class="activity-content">
-                    Est sit eum reiciendis exercitationem
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">4 weeks</div>
-                  <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
-                  <div class="activity-content">
-                    Dicta dolorem harum nulla eius. Ut quidem quidem sit quas
-                  </div>
-                </div><!-- End activity item-->
+               
 
               </div>
 
