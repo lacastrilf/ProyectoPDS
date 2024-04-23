@@ -460,7 +460,7 @@ if(isset($_POST['enviarPendiente'])){
                                           <i class="bi bi-currency-dollar"></i>
                                       </div>
                                       <div class="ps-3">
-                                          <h6>$<?php echo $sumaTotal ?></h6>
+                                          <h6>$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
                                       </div>
                                   </div>
                               </div>
@@ -479,15 +479,13 @@ if(isset($_POST['enviarPendiente'])){
                                       <li class="dropdown-header text-start">
                                           <h6>Filter</h6>
                                       </li>
-
                                       <li><a class="dropdown-item" href="#">Today</a></li>
                                       <li><a class="dropdown-item" href="#">This Month</a></li>
                                       <li><a class="dropdown-item" href="#">This Year</a></li>
                                   </ul>
                               </div>
-
                               <div class="card-body">
-                                  <h5 class="card-title">Customers <span>| This Year</span></h5>
+                                  <h5 class="card-title">Ahorro <span>| Esta Semana</span></h5>
 
                                   <div class="d-flex align-items-center">
                                       <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
@@ -524,7 +522,7 @@ if(isset($_POST['enviarPendiente'])){
                       </div>
 
                       <div class="card-body">
-                          <h5 class="card-title">Recent Activity <span>| Today</span></h5>
+                          <h5 class="card-title">Pendientes</h5>
 
                           <div class="activity">
 

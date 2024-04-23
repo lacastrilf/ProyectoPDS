@@ -402,7 +402,7 @@ if(isset($_POST['enviarPendiente'])){
                       <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>$<?php echo $sumaTotal ?></h6>
+                      <h6>$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
                       </div>
                   </div>
                 </div>
@@ -423,7 +423,7 @@ if(isset($_POST['enviarPendiente'])){
                   </ul>
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title">Customers <span>| This Year</span></h5>
+                  <h5 class="card-title">Ahorro <span>| Esta Semana</span></h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-people"></i>
@@ -447,7 +447,7 @@ if(isset($_POST['enviarPendiente'])){
             <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirPendientes"><i class="bi bi-plus-circle"></i></a>
             </div>
             <div class="card-body">
-              <h5 class="card-title">Recent Activity <span>| Today</span></h5>
+              <h5 class="card-title">Pendientes</h5>
               <div class="activity">
 
                 
