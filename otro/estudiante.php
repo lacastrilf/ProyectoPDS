@@ -79,6 +79,7 @@ if ($resultado->num_rows == 0) {
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- =======================================================
   * Template Name: NiceAdmin
   * Updated: Jan 29 2024 with Bootstrap v5.3.2
@@ -392,8 +393,8 @@ if ($resultado->num_rows == 0) {
                       <i class="bi bi-cart"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>$<?php echo($sumaTotalG) ?></h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
+                      <h6 id="total_gastos">$<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?></h6>
+                        <span id="porcentaje" class="text-success small pt-1 fw-bold"></span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
                     </div>
                   </div>
                 </div>
@@ -418,7 +419,7 @@ if ($resultado->num_rows == 0) {
                       <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
+                      <h6 id="presupuesto_usuario">$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
                       </div>
                   </div>
                 </div>
@@ -620,7 +621,6 @@ if ($resultado->num_rows == 0) {
                       left: 'center'
                     },
                     series: [{
-                      name: 'Access From',
                       type: 'pie',
                       radius: ['40%', '70%'],
                       avoidLabelOverlap: false,
@@ -892,7 +892,24 @@ if ($resultado->num_rows == 0) {
     </div>
   </footer><!-- End Footer -->
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <!-- Vendor JS Files -->
+  <script>
+      $(document).ready(function() {
+      function actualizarPorcentaje() {
+          var presupuestoTexto = $('#presupuesto_usuario').text().replace('$', '').replace(',', '');
+          var totalGastosTexto = $('#total_gastos').text().replace('$', '').replace(',', '');
+          var presupuesto = parseFloat(presupuestoTexto);
+          var totalGastos = parseFloat(totalGastosTexto);
+          if (!isNaN(presupuesto) && !isNaN(totalGastos) && presupuesto !== 0) {
+              var porcentaje = (totalGastos / presupuesto) * 100;
+              $('#porcentaje').text(porcentaje.toFixed(2) + '%');
+          } else {
+              $('#porcentaje').text('0%');
+          }
+      }
+      actualizarPorcentaje();
+      });
+  </script>
+
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/chart.js/chart.umd.js"></script>

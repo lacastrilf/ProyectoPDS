@@ -12,6 +12,11 @@ $sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + servicios + transporte + 
 $resultadoSuma = $conexion->query($sqlSuma);
 $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
 
+//Obtener la suma total de los gastos
+$sqlSumaG = "SELECT SUM(alimentacion + transporte + servicios + vivienda + ocio ) AS suma_total FROM diagramagastoshogar WHERE idUsuario='$idUsuario'";
+$resultadoSumaG= $conexion->query($sqlSumaG);
+$sumaTotalG = $resultadoSumaG->fetch_assoc()['suma_total'];
+
 //Creación de fila de la tabla diagrama Costos del Hogar
 $sqlSeleccion = "SELECT * FROM diagramagastoshogar WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccion);
@@ -70,7 +75,7 @@ if(isset($_POST['enviarPendiente'])){
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- =======================================================
   * Template Name: NiceAdmin
   * Updated: Jan 29 2024 with Bootstrap v5.3.2
@@ -403,55 +408,33 @@ if(isset($_POST['enviarPendiente'])){
                       <!-- Sales Card -->
                       <div class="col-xxl-4 col-xl-4 col-md-4">
                           <div class="card info-card sales-card">
-
-                              <div class="filter">
-                                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                      <li class="dropdown-header text-start">
-                                          <h6>Filter</h6>
-                                      </li>
-
-                                      <li><a class="dropdown-item" href="#">Today</a></li>
-                                      <li><a class="dropdown-item" href="#">This Month</a></li>
-                                      <li><a class="dropdown-item" href="#">This Year</a></li>
-                                  </ul>
-                              </div>
-
                               <div class="card-body">
-                                  <h5 class="card-title">Sales <span>| Today</span></h5>
-
+                                  <h5 class="card-title">Gastos <span>| Semanales</span></h5>
                                   <div class="d-flex align-items-center">
                                       <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                           <i class="bi bi-cart"></i>
                                       </div>
                                       <div class="ps-3">
-                                          <h6>145</h6>
-                                          <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
+                                          <h6 id="total_gastos">$<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?></h6>
+                                          <span id="porcentaje" class="text-success small pt-1 fw-bold"></span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
                                       </div>
                                   </div>
                               </div>
-
                           </div>
                       </div><!-- End Sales Card -->
 
                       <!-- Revenue Card -->
                       <div class="col-xxl-4 col-xl-4 col-md-4">
                           <div class="card info-card revenue-card">
-
                               <div class="filter">
                                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                       <li class="dropdown-header text-start">
-                                          <h6>Filter</h6>
+                                          <h6>Actualizar</h6>
                                       </li>
 
-                                      <li><a class="dropdown-item" href="#">Today</a></li>
-                                      <li><a class="dropdown-item" href="#">This Month</a></li>
-                                      <li><a class="dropdown-item" href="#">This Year</a></li>
                                   </ul>
                               </div>
-
                               <div class="card-body">
                                   <h5 class="card-title">Presupuesto <span>| Esta Semana</span></h5>
 
@@ -460,7 +443,7 @@ if(isset($_POST['enviarPendiente'])){
                                           <i class="bi bi-currency-dollar"></i>
                                       </div>
                                       <div class="ps-3">
-                                          <h6>$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
+                                          <h6 id="presupuesto_usuario" >$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
                                       </div>
                                   </div>
                               </div>
@@ -991,7 +974,23 @@ if(isset($_POST['enviarPendiente'])){
   </footer><!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
+  <script>
+      $(document).ready(function() {
+          function actualizarPorcentaje() {
+              var presupuestoTexto = $('#presupuesto_usuario').text().replace('$', '').replace(',', '');
+              var totalGastosTexto = $('#total_gastos').text().replace('$', '').replace(',', '');
+              var presupuesto = parseFloat(presupuestoTexto);
+              var totalGastos = parseFloat(totalGastosTexto);
+              if (!isNaN(presupuesto) && !isNaN(totalGastos) && presupuesto !== 0) {
+                  var porcentaje = (totalGastos / presupuesto) * 100;
+                  $('#porcentaje').text(porcentaje.toFixed(2) + '%');
+              } else {
+                  $('#porcentaje').text('0%');
+              }
+          }
+          actualizarPorcentaje();
+      });
+  </script>
   <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
