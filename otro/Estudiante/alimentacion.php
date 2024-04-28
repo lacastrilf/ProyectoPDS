@@ -967,6 +967,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
               event.preventDefault();
               var monto = $('#gasto').val();
               var descripcion = $('#descripcion').val();
+
               $.ajax({
                   url: 'alimentacion.php',
                   method: 'POST',
@@ -977,6 +978,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                       var totalActual = parseFloat($('#total_gastos').text().replace('$', ''));
                       var nuevoTotal = totalActual + parseFloat(monto);
                       $('#total_gastos').text('$' + nuevoTotal);
+
                       actualizarPorcentaje();
                   },
                   error: function(xhr, status, error) {
