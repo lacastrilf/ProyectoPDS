@@ -10,7 +10,18 @@ $conexion = new mysqli("localhost", "root", "", "base_proyecto");
 // Obtener la suma de todos los presupuestos
 $sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + servicios + transporte + vivienda) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultadoSuma = $conexion->query($sqlSuma);
-$sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
+$sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'] ?? 0;
+
+//obtener cada presupuesto para la grafica
+$sqlCategorias = "SELECT alimentacion AS alimentacion, transporte AS transporte, ocio AS ocio, servicios AS servicios, vivienda AS vivienda FROM presupuestos WHERE id_usuario='$idUsuario'";
+$resultadoCategorias = $conexion->query($sqlCategorias);
+$categorias = $resultadoCategorias->fetch_assoc() ?? ['alimentacion' => 0, 'transporte' => 0, 'ocio' => 0, 'servicios' => 0, 'vivienda' => 0];
+$gAlimentacion = $categorias['alimentacion'];
+$gTransporte = $categorias['transporte'];
+$gOcio = $categorias['ocio'];
+$gServicios = $categorias['servicios'];
+$gVivienda = $categorias['vivienda'];
+
 
 //Obtener la suma total de los gastos
 $sqlSumaG = "SELECT SUM(alimentacion + transporte + servicios + vivienda + ocio ) AS suma_total FROM diagramagastoshogar WHERE idUsuario='$idUsuario'";
@@ -566,79 +577,51 @@ if(isset($_POST['enviarPendiente'])){
               </div><!-- End Recent Activity -->
 
 
-              
+
 
               <div class="col-lg-4">
                   <div class="card">
-                      <div class="filter">
-                          <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                              <li class="dropdown-header text-start">
-                                  <h6>Filter</h6>
-                              </li>
-
-                              <li><a class="dropdown-item" href="#">Today</a></li>
-                              <li><a class="dropdown-item" href="#">This Month</a></li>
-                              <li><a class="dropdown-item" href="#">This Year</a></li>
-                          </ul>
-                      </div>
-
                       <div class="card-body pb-0">
-                          <h5 class="card-title">Budget Report <span>| This Month</span></h5>
-
+                          <h5 class="card-title">Gasto y presupuesto <span> | Semanal</span></h5>
                           <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
-
                           <script>
                               document.addEventListener("DOMContentLoaded", () => {
                                   var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
                                       legend: {
-                                          data: ['Allocated Budget', 'Actual Spending']
+                                          data: ['Gastos', 'Presupuesto']
                                       },
                                       radar: {
-                                          // shape: 'circle',
-                                          indicator: [{
-                                              name: 'Sales',
-                                              max: 6500
-                                          },
-                                              {
-                                                  name: 'Administration',
-                                                  max: 16000
-                                              },
-                                              {
-                                                  name: 'Information Technology',
-                                                  max: 30000
-                                              },
-                                              {
-                                                  name: 'Customer Support',
-                                                  max: 38000
-                                              },
-                                              {
-                                                  name: 'Development',
-                                                  max: 52000
-                                              },
-                                              {
-                                                  name: 'Marketing',
-                                                  max: 25000
-                                              }
+                                          indicator: [
+                                              { name: 'Transporte', max: <?php echo $sumaTotal; ?>},
+                                              { name: 'Alimentación', max: <?php echo $sumaTotal; ?> },
+                                              { name: 'Vivienda', max: <?php echo $sumaTotal; ?> },
+                                              { name: 'Servicios', max: <?php echo $sumaTotal; ?> },
+                                              { name: 'Ocio', max: <?php echo $sumaTotal; ?> },
                                           ]
                                       },
                                       series: [{
-                                          name: 'Budget vs spending',
+                                          name: 'Presupuesto vs Gastos',
                                           type: 'radar',
                                           data: [{
-                                              value: [4200, 3000, 20000, 35000, 50000, 18000],
-                                              name: 'Allocated Budget'
+                                              value: [<?php echo $transporteGrafico; ?>, <?php echo $alimentacionGrafico; ?>, <?php echo $viviendaGrafico; ?>, <?php echo $serviciosGrafico; ?>, <?php echo $ocioGrafico; ?>],
+                                              name: 'Gastos',
+                                              areaStyle: {
+                                                  color: 'rgba(0, 128, 255, 0.5)'
+                                              }
                                           },
                                               {
-                                                  value: [5000, 14000, 28000, 26000, 42000, 21000],
-                                                  name: 'Actual Spending'
-                                              }
-                                          ]
+                                                  value: [<?php echo $gTransporte; ?>,<?php echo $gAlimentacion; ?>, <?php echo $gVivienda; ?>, <?php echo $gServicios; ?>,<?php echo $gOcio; ?>],
+                                                  name: 'Presupuesto',
+                                                  areaStyle: {
+                                                      color: 'rgba(64,255,0,0.5)'
+                                                  }
+                                              }]
                                       }]
                                   });
                               });
-                          </script>
 
+
+                          </script>
                       </div>
                   </div><!-- End Budget Report -->
               </div>

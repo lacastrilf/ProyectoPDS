@@ -10,7 +10,15 @@ $conexion = new mysqli("localhost", "root", "", "base_proyecto");
 //Obtener la suma de todos los presupuestos
 $sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + servicios + transporte + vivienda) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultadoSuma = $conexion->query($sqlSuma);
-$sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'];
+$sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'] ?? 0;
+
+//obtener cada presupuesto para la grafica
+$sqlCategorias = "SELECT alimentacion AS alimentacion, transporte AS transporte, ocio AS ocio FROM presupuestos WHERE id_usuario='$idUsuario'";
+$resultadoCategorias = $conexion->query($sqlCategorias);
+$categorias = $resultadoCategorias->fetch_assoc() ?? ['alimentacion' => 0, 'transporte' => 0, 'ocio' => 0];
+$gAlimentacion = $categorias['alimentacion'];
+$gTransporte = $categorias['transporte'];
+$gOcio = $categorias['ocio'];
 
 //Obtener la suma total de los gastos
 $sqlSumaG = "SELECT SUM(transporte+alimentacion+ocio) AS suma_total FROM diagramagastosestudiante WHERE idUsuario='$idUsuario'";
@@ -528,56 +536,42 @@ if ($resultado->num_rows == 0) {
             <div class="card-body pb-0">
               <h5 class="card-title">Gasto y presupuesto <span> | Semanal</span></h5>
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
-                    legend: {
-                      data: ['Allocated Budget', 'Actual Spending']
-                    },
-                    radar: {
-                      // shape: 'circle',
-                      indicator: [{
-                          name: 'Sales',
-                          max: 6500
-                        },
-                        {
-                          name: 'Administration',
-                          max: 16000
-                        },
-                        {
-                          name: 'Information Technology',
-                          max: 30000
-                        },
-                        {
-                          name: 'Customer Support',
-                          max: 38000
-                        },
-                        {
-                          name: 'Development',
-                          max: 52000
-                        },
-                        {
-                          name: 'Marketing',
-                          max: 25000
-                        }
-                      ]
-                    },
-                    series: [{
-                      name: 'Budget vs spending',
-                      type: 'radar',
-                      data: [{
-                          value: [4200, 3000, 20000, 35000, 50000, 18000],
-                          name: 'Allocated Budget'
-                        },
-                        {
-                          value: [5000, 14000, 28000, 26000, 42000, 21000],
-                          name: 'Actual Spending'
-                        }
-                      ]
-                    }]
-                  });
-                });
-              </script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
+                            legend: {
+                                data: ['Gastos', 'Presupuesto']
+                            },
+                            radar: {
+                                indicator: [
+                                    { name: 'Transporte', max: <?php echo $sumaTotal; ?> },
+                                    { name: 'Alimentación', max: <?php echo $sumaTotal; ?> },
+                                    { name: 'Ocio', max: <?php echo $sumaTotal; ?> },
+                                ]
+                            },
+                            series: [{
+                                name: 'Presupuesto vs Gastos',
+                                type: 'radar',
+                                data: [{
+                                    value: [<?php echo $transporteGrafico; ?>, <?php echo $alimentacionGrafico; ?>, <?php echo $ocioGrafico; ?>],
+                                    name: 'Gastos',
+                                    areaStyle: {
+                                        color: 'rgba(0, 128, 255, 0.5)'
+                                    }
+                                },
+                                    {
+                                        value: [<?php echo $gTransporte; ?>, <?php echo $gAlimentacion; ?>, <?php echo $gOcio; ?>],
+                                        name: 'Presupuesto',
+                                        areaStyle: {
+                                            color: 'rgba(64,255,0,0.5)'
+                                        }
+                                    }]
+                            }]
+                        });
+                    });
+
+
+                </script>
             </div>
           </div><!-- End Budget Report -->
         </div>
