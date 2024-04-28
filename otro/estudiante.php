@@ -443,7 +443,7 @@ if ($resultado->num_rows == 0) {
                   <h5 class="card-title">Ahorro <span>| Esta Semana</span></h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-people"></i>
+                      <i class="bi bi-piggy-bank-fill"></i>
                     </div>
                     <div class="ps-3">
                       <h6>1244</h6>
@@ -525,19 +525,8 @@ if ($resultado->num_rows == 0) {
 
           <div class="col-lg-4">
           <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
             <div class="card-body pb-0">
-              <h5 class="card-title">Budget Report <span>| This Month</span></h5>
+              <h5 class="card-title">Gasto y presupuesto <span> | Semanal</span></h5>
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
@@ -595,20 +584,9 @@ if ($resultado->num_rows == 0) {
             <div class="col-lg-4">
           <!-- Website Traffic -->
           <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
 
             <div class="card-body pb-0">
-              <h5 class="card-title">Gráficas Gastos <span>| Semanales</span></h5>
+              <h5 class="card-title">Gráficas Gastos <span>| Semanal</span></h5>
               <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
               <script>
                 document.addEventListener("DOMContentLoaded", () => {

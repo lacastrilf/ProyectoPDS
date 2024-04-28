@@ -472,7 +472,7 @@ if(isset($_POST['enviarPendiente'])){
 
                                   <div class="d-flex align-items-center">
                                       <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                          <i class="bi bi-people"></i>
+                                          <i class="bi bi-piggy-bank-fill"></i>
                                       </div>
                                       <div class="ps-3">
                                           <h6>1244</h6>
