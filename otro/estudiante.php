@@ -29,7 +29,7 @@ $sumaTotalG = $resultadoSumaG->fetch_assoc()['suma_total'];
 $sqlSeleccion= "SELECT * FROM diagramagastosestudiante WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccion);
 if ($resultado->num_rows == 0) {
-    $sqlIngresar="INSERT INTO diagramagastosestudiante VALUES ('null', '$idUsuario', '0', '0', '0')";
+    $sqlIngresar="INSERT INTO diagramagastosestudiante VALUES ('null', '$idUsuario', '0', '0', '0','0')";
     $ejecutar3 = mysqli_query($conexion, $sqlIngresar);
 }
 $resultado = $conexion->query($sqlSeleccion);
@@ -58,14 +58,156 @@ if ($resultado->num_rows == 0) {
     $ejecutar4 = mysqli_query($conexion, $sqlIngresarSemanas);
 }
 
+//Creación de fila de la tabla presupuestos
+$sqlSeleccionPresupuestos= "SELECT * FROM presupuestos WHERE id_usuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionPresupuestos);
+if ($resultado->num_rows == 0) {
+    $sqlIngresarPresupuestos="INSERT INTO presupuestos VALUES ('$idUsuario', '0', '0', '0', '0','0','0')";
+    $ejecutar12 = mysqli_query($conexion, $sqlIngresarPresupuestos);
+}
+
+//Creación de fila de la tabla Ahorro
+$sqlSeleccionAhorro= "SELECT * FROM ahorro WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionAhorro);
+if ($resultado->num_rows == 0) {
+    $sqlIngresarAhorro="INSERT INTO ahorro VALUES ('null', '$idUsuario', '0', '0')";
+    $ejecutar4 = mysqli_query($conexion, $sqlIngresarAhorro);
+}
+else{
+  $datoAhorro=$resultado->fetch_assoc();
+  $ahorroTotal=$datoAhorro['Ahorro'];
+}
+
+//Creación de fila de la tabla Grafica ahorro
+$sqlSeleccionGrafica= "SELECT * FROM semanasgastos WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionGrafica);
+if ($resultado->num_rows == 0) {
+  $i=1;
+  while($i<5){
+    $sqlIngresarGrafica="INSERT INTO semanasgastos VALUES ('null', '$idUsuario', '$i', '0','0','0','0')";
+    $ejecutar14 = mysqli_query($conexion, $sqlIngresarGrafica);
+    $i=$i+1;
+  }
+}
+
+  function datos($conexion, $idUsuario){
+    $sqlGastosSemanas="SELECT * FROM diagramagastosestudiante WHERE idUsuario='$idUsuario'";
+    $resultado = $conexion->query($sqlGastosSemanas);
+    $datoGastos = $resultado->fetch_assoc(); 
+    return $datoGastos;
+  }
+
+
+//Actualizar semanas
+if(isset($_POST['actualizarSemanas'])){
+
+  //Seleccion de gastos por semana
+
+  $alimentacionGS=datos($conexion, $idUsuario);
+  $transporteGS=$alimentacionGS['transporte'];;
+  $ocioGS=$alimentacionGS['ocio'];;
+  $colchonGS=$alimentacionGS['colchon'];;
+  $alimentacionGS=$alimentacionGS['alimentacion'];
+
+
+
+
+  $sqlSeleccionSemanas= "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
+  $resultado = $conexion->query($sqlSeleccionSemanas);
+  $dato = $resultado->fetch_assoc();
+  if($dato['semana1']==0){
+    $sqlUpdateSemanas= "UPDATE semanas SET semana1='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
+    $sqlUpdatePresupuestosGS= "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
+    $ejecutar15= mysqli_query($conexion, $sqlUpdatePresupuestosGS);
+    
+  }
+  else if($dato['semana2']==0){
+    $sqlUpdateSemanas= "UPDATE semanas SET semana2='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
+    $sqlUpdatePresupuestosGS= "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='2'";
+    $ejecutar15= mysqli_query($conexion, $sqlUpdatePresupuestosGS);
+    
+  }
+  else if($dato['semana3']==0){
+    $sqlUpdateSemanas= "UPDATE semanas SET semana3='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
+    $sqlUpdatePresupuestosGS= "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='3'";
+    $ejecutar15= mysqli_query($conexion, $sqlUpdatePresupuestosGS);
+  }
+  else if($dato['semana4']==0){
+    $sqlUpdateSemanas= "UPDATE semanas SET semana4='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
+    $sqlUpdatePresupuestosGS= "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='4'";
+    $ejecutar15= mysqli_query($conexion, $sqlUpdatePresupuestosGS);
+  }
+  else{
+    echo("Reiniciar semanas");
+    $sqlUpdateSemanas= "UPDATE semanas SET semana1=0, semana2=0, semana3=0, semana4=0 WHERE idUsuario='$idUsuario'";
+    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
+    
+  }
+  
+
+  //Update Ahorro
+  $sqlSeleccionarAhorro="SELECT * FROM ahorro WHERE idUsuario='$idUsuario'";
+  $resultado = $conexion->query($sqlSeleccionarAhorro);
+  $dato = $resultado->fetch_assoc();
+  if($dato){
+    $ahorro=$sumaTotal-$sumaTotalG+$dato['Ahorro'];
+    $sqlUpdateAhorro= "UPDATE ahorro SET ahorro='$ahorro' WHERE idUsuario='$idUsuario'";
+    $ejecutar10 = mysqli_query($conexion, $sqlUpdateAhorro);
+   
+  }
+
+
+  //Eliminar datos de las tablas para iniciar cada semana 
+  $sqlEliminarGastos="DELETE FROM gastosi WHERE id_usuario='$idUsuario'";
+  $ejecutar6 = mysqli_query($conexion, $sqlEliminarGastos);
+  $sqlEliminarPendientes="DELETE FROM pendiente WHERE idUsuario='$idUsuario'";
+  $ejecutar7 = mysqli_query($conexion, $sqlEliminarPendientes);
+  $sqlEliminarEventos="DELETE FROM eventosespeciales WHERE idUsuario='$idUsuario'";
+  $ejecutar8 = mysqli_query($conexion, $sqlEliminarEventos);
+  $sqlEliminarPresupuestos="DELETE FROM presupuestos WHERE id_usuario='$idUsuario'";
+  $ejecutar9 = mysqli_query($conexion, $sqlEliminarPresupuestos);
+  header("Location: {$_SERVER['PHP_SELF']}");
+
+}
+
+  //Retirar Ahorros
+  if(isset($_POST['retirar'])){
+    $sqlSeleccionarAhorro="SELECT * FROM ahorro WHERE idUsuario='$idUsuario'";
+    $resultado = $conexion->query($sqlSeleccionarAhorro);
+    $dato = $resultado->fetch_assoc();
+    $presupuesto=0;
+    $presupuesto=$dato['Ahorro']+$sumaTotal;
+    $sqlUpdateAhorro= "UPDATE ahorro SET Ahorro=0 WHERE idUsuario='$idUsuario'";
+    $ejecutar10 = mysqli_query($conexion, $sqlUpdateAhorro);
+    $sqlUpdatePresupuestos= "UPDATE presupuestos SET colchon='$presupuesto' WHERE id_usuario='$idUsuario'";
+    $ejecutar11 = mysqli_query($conexion, $sqlUpdatePresupuestos);
+    header("Location: {$_SERVER['PHP_SELF']}");
+  }
+
+  //Registrar ahorros
+  if(isset($_POST['registrarAhorro'])){
+    $ahorroEstablecido=$_POST['ahorroEstablecido'];
+    $sqlUpdateAhorro= "UPDATE ahorro SET ahorroEstablecido='$ahorroEstablecido' WHERE idUsuario='$idUsuario'";
+    $ejecutar13 = mysqli_query($conexion, $sqlUpdateAhorro);
+    header("Location: {$_SERVER['PHP_SELF']}");
+  }
+ 
 
 
 
 ?>
 
+
+
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
+
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>SmartSpends</title>
@@ -97,7 +239,6 @@ if ($resultado->num_rows == 0) {
   ======================================================== -->
 </head>
 <body>
-
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="d-flex align-items-center justify-content-between">
@@ -395,7 +536,14 @@ if ($resultado->num_rows == 0) {
                   </ul>
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title">Gastos <span>| Semanales</span></h5>
+                  <h5 class="card-title"><?php   
+  $sqlGastosSemanas="SELECT * FROM diagramagastosestudiante WHERE idUsuario='$idUsuario'";
+  $resultado = $conexion->query($sqlGastosSemanas);
+  $datoGastos = $resultado->fetch_assoc(); 
+  echo($datoGastos['alimentacion']);
+  ?>
+
+  <span>| Semanales</span></h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-cart"></i>
@@ -442,22 +590,32 @@ if ($resultado->num_rows == 0) {
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item" href="#" >Actualizar</a></li>
+                    <li>
+                      <form action="estudiante.php" method="POST">
+                      <input type="hidden" value="<?php echo (isset($ahorroTotal) ? $ahorroTotal : 0); ?>" name="ahorroEstablecido">
+                      <input type="submit" class="dropdown-item" href="#" name="retirar" value="Retirar">
+                      </form>
+                    </li>
                   </ul>
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title">Ahorro <span>| Esta Semana</span></h5>
+                  <h5 class="card-title">Ahorro <span>| Meta</span></h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-piggy-bank-fill"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>1244</h6>
+                      <h6><?php echo ($ahorroTotal) ?></h6>
                       <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
                     </div>
                   </div>
+
+                  <form action="estudiante.php" method="POST">
+                    <label>cuanto ahorro</label>
+                    <input type="number" name="ahorroEstablecido">
+                    <input type="submit" value="Enviar" name="registrarAhorro">
+                  </form>
                 </div>
               </div>
             </div>
@@ -536,7 +694,10 @@ if ($resultado->num_rows == 0) {
             <div class="card-body pb-0">
               <h5 class="card-title">Gasto y presupuesto <span> | Semanal</span></h5>
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
+
                 <script>
+
+
                     document.addEventListener("DOMContentLoaded", () => {
                         var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
                             legend: {
@@ -652,20 +813,35 @@ if ($resultado->num_rows == 0) {
                 <div class="card-body">
                   <h5 class="card-title">Reports <span>/Today</span></h5>
                   <!-- Line Chart -->
-                  <div id="reportsChart"></div>
+                  <?php
+                  $sqlSeleccionarGrafica="SELECT * FROM semanasgastos WHERE idUsuario='$idUsuario'";
+                  $resultado=mysqli_query($conexion, $sqlSeleccionarGrafica);
+                  $array_Grafica=array();
+                  if ($resultado){
+                    while($row = $resultado->fetch_array()){
+                      array_push($array_Grafica, $row);
+                     }
+                  }
+                  ?>
+                  <div id="reportsChart">
+                  <?php print_r($array_Grafica[0])?>
+                  </div>
                   <script>
                     document.addEventListener("DOMContentLoaded", () => {
                       new ApexCharts(document.querySelector("#reportsChart"), {
                         series: [{
-                          name: 'Sales',
-                          data: [31, 40, 28, 51, 42, 82, 56],
+                          name: 'Transporte',
+                          data: [<?php print_r($array_Grafica[0]['transporte']); ?>,<?php print_r($array_Grafica[1]['transporte']); ?>, <?php print_r($array_Grafica[2]['transporte']); ?>, <?php print_r($array_Grafica[3]['transporte']); ?>],
                         }, {
-                          name: 'Revenue',
-                          data: [11, 32, 45, 32, 34, 52, 41]
+                          name: 'Alimentacion',
+                          data: [<?php print_r($array_Grafica[0]['alimentacion']); ?>,<?php print_r($array_Grafica[1]['alimentacion']); ?>, <?php print_r($array_Grafica[2]['alimentacion']); ?>, <?php print_r($array_Grafica[3]['alimentacion']); ?>]
                         }, {
-                          name: 'Customers',
-                          data: [15, 11, 32, 18, 9, 24, 11]
-                        }],
+                          name: 'Ocio',
+                          data: [<?php print_r($array_Grafica[0]['ocio']); ?>,<?php print_r($array_Grafica[1]['ocio']); ?>, <?php print_r($array_Grafica[2]['ocio']); ?>, <?php print_r($array_Grafica[3]['ocio']); ?>]
+                        },{
+                          name: 'Colchon',
+                          data: [<?php print_r($array_Grafica[0]['colchon']); ?>,<?php print_r($array_Grafica[1]['colchon']); ?>, <?php print_r($array_Grafica[2]['colchon']); ?>, <?php print_r($array_Grafica[3]['colchon']); ?>]
+                        },],
                         chart: {
                           height: 350,
                           type: 'area',
@@ -676,7 +852,7 @@ if ($resultado->num_rows == 0) {
                         markers: {
                           size: 4
                         },
-                        colors: ['#4154f1', '#2eca6a', '#ff771d'],
+                        colors: ['#4154f1', '#2eca6a', '#ff771d','#F930FF'],
                         fill: {
                           type: "gradient",
                           gradient: {
@@ -694,8 +870,8 @@ if ($resultado->num_rows == 0) {
                           width: 2
                         },
                         xaxis: {
-                          type: 'datetime',
-                          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
+                          type: 'text',
+                          categories: ["Semana 1", "Semana 2", "Semana 3", "Semana 4"]
                         },
                         tooltip: {
                           x: {
