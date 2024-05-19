@@ -224,7 +224,7 @@ if(isset($_POST['agregarEvento'])){
                                   <form id="formNuevoGasto">
                                       <div class="mb-3">
                                           <label for="gasto">Monto:</label>
-                                          <input type="number" class="form-control" id="gasto" name="gasto" required>
+                                          <input type="number" class="form-control" id="gasto" name="gasto" min="0" required>
                                       </div>
                                       <div class="mb-3">
                                           <label for="descripcion">Descripción:</label>
@@ -282,7 +282,7 @@ if(isset($_POST['agregarEvento'])){
                                                   <form id="formEditarPresupuesto">
                                                       <div class="mb-3">
                                                           <label for="presupuesto">Nuevo Presupuesto:</label>
-                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto"   required>
+                                                          <input type="number" class="form-control" id="presupuesto" name="presupuesto" min="0"   required>
                                                       </div>
                                                       <button type="submit" class="btn btn-success">Guardar</button>
                                                   </form>
