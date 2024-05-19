@@ -52,6 +52,26 @@ if(isset($_POST['enviarPendiente'])){
     header("Location: {$_SERVER['PHP_SELF']}");
 }
 
+// Manejo de solicitud AJAX para eliminar pendientes
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['accion']) && $_POST['accion'] == 'eliminar') {
+    $idPendiente = $_POST['idPendiente'];
+
+    // Eliminar el pendiente
+    $sqlDeletePendiente = "DELETE FROM pendiente WHERE id = ?";
+    $stmt = $conexion->prepare($sqlDeletePendiente);
+    $stmt->bind_param("i", $idPendiente);
+
+    if ($stmt->execute()) {
+        echo 'success';
+    } else {
+        echo 'error';
+    }
+
+    $stmt->close();
+    $conexion->close();
+    exit;
+}
+
 // Creación de fila de la tabla promedio semanas
 $sqlSeleccionSemanas= "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccionSemanas);
@@ -300,9 +320,13 @@ if (isset($_POST['registrarAhorro'])) {
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-                    <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
-                </a><!-- End Profile Iamge Icon -->
+                    <span class="d-none d-md-block dropdown-toggle ps-2"><?php
+                        if(isset($_SESSION['usuario'])) {
+                            echo $_SESSION['usuario'];
+                        }
+                        ?>
+                    </span>
+                </a>
 
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
@@ -548,19 +572,53 @@ if (isset($_POST['registrarAhorro'])) {
                     $nombrePendiente=$row['nombre'];
                     $montoPendiente=$row['precio'];
                     $fechaPendiente=$row['fecha'];
+                    $idPendiente = $row['id'];
                  
                 ?>
                   <div class="activity-item d-flex" >
-                  <div class="activite-label"><?php echo($fechaPendiente); ?><br><b> <p>$<?php echo($montoPendiente); ?></p></b></div>
-                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                  <div class="activity-content"><?php echo($nombrePendiente); ?> </div>
-                 
+                      <div class="activite-label"><?php echo($fechaPendiente); ?><br><b> <p>$<?php echo($montoPendiente); ?></p></b></div>
+                      <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
+                      <div class="activity-content flex-grow-1">
+                          <?php echo($nombrePendiente); ?>
+                              <button class="btn btn-sm btn-outline-danger btn-delete m-3" onclick="eliminarPendiente(<?php echo $idPendiente; ?>)">
+                                  <i class="bi bi-trash"></i>
+                              </button>
+                      </div>
+
                 </div><!-- End activity item-->
                 <?php
                    }
                 }
 
                 ?>
+                  <script>
+                      function eliminarPendiente(idPendiente) {
+                          if (confirm('¿Estás seguro de que deseas eliminar este pendiente?')) {
+                              var button = document.querySelector('button[onclick="eliminarPendiente(' + idPendiente + ')"]');
+                              button.disabled = true; // Deshabilitar el botón mientras se procesa la solicitud
+
+                              $.ajax({
+                                  url: 'estudiante.php',
+                                  method: 'POST',
+                                  data: { accion: 'eliminar', idPendiente: idPendiente },
+                                  success: function(response) {
+                                      if (response === 'success') {
+                                          alert('Pendiente eliminado correctamente');
+                                          button.closest('.activity-item').remove(); // Eliminar el elemento del DOM sin recargar la página
+                                      } else {
+                                          alert('Error al eliminar el pendiente');
+                                          button.disabled = false; // Rehabilitar el botón si hay un error
+                                      }
+                                  },
+                                  error: function(xhr, status, error) {
+                                      alert('Error al eliminar el pendiente');
+                                      console.error(xhr.responseText);
+                                      button.disabled = false; // Rehabilitar el botón si hay un error
+                                  }
+                              });
+                          }
+                      }
+                  </script>
                   <div class="modal fade" id="modalAñadirPendientes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                       <div class="modal-dialog">
                           <div class="modal-content">
@@ -576,11 +634,11 @@ if (isset($_POST['registrarAhorro'])) {
                                               </div>
                                               <div class="mb-3">
                                                   <label for="monto">Monto:</label>
-                                                  <input type="number" class="form-control" id="monto" name="montoPendiente" placeholder="Monto">
+                                                  <input type="number" class="form-control" id="monto" name="montoPendiente" placeholder="Monto" min="0" required>
                                               </div>
                                               <div class="mb-3">
                                                   <label for="descripcion">Fecha:</label>
-                                                  <input type="date" class="form-control" id="descripcion" name="fechaPendiente">
+                                                  <input type="date" class="form-control" id="descripcion" name="fechaPendiente" required>
                                               </div>
                                               <button type="submit" class="btn btn-success" name="enviarPendiente">Guardar</button>
                                           </form>
@@ -697,18 +755,13 @@ if (isset($_POST['registrarAhorro'])) {
                 });
               </script>
             </div>
-          </div><!-- End Website Traffic -->
+          </div>
             </div>
-
-
-
-                <!-- End Customers Card -->
             <!-- Reports -->
             <div class="col-12">
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title">Gastos <span>/ultimo mes</span></h5>
-
                   <?php
                   $sqlSeleccionarGrafica="SELECT * FROM semanasgastos WHERE idUsuario='$idUsuario'";
                   $resultado=mysqli_query($conexion, $sqlSeleccionarGrafica);
@@ -719,8 +772,8 @@ if (isset($_POST['registrarAhorro'])) {
                      }
                   }
                   ?>
-                  <div id="reportsChart">
-                  </div>
+                      <div id="reportsChart">
+                      </div>
                   <script>
                     document.addEventListener("DOMContentLoaded", () => {
                       new ApexCharts(document.querySelector("#reportsChart"), {
@@ -915,9 +968,9 @@ if (isset($_POST['registrarAhorro'])) {
               </div>
             </div><!-- End Top Selling -->
           </div>
-        </div><!-- End Left side columns -->
-          </div><!-- End News & Updates -->
-    </div>
+        </div>
+        </div>
+      </div>
       </div>
     </section>
   </main><!-- End #main -->
@@ -937,19 +990,20 @@ if (isset($_POST['registrarAhorro'])) {
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script>
       $(document).ready(function() {
-      function actualizarPorcentaje() {
-          var presupuestoTexto = $('#presupuesto_usuario').text().replace('$', '').replace(',', '');
-          var totalGastosTexto = $('#total_gastos').text().replace('$', '').replace(',', '');
-          var presupuesto = parseFloat(presupuestoTexto);
-          var totalGastos = parseFloat(totalGastosTexto);
-          if (!isNaN(presupuesto) && !isNaN(totalGastos) && presupuesto !== 0) {
-              var porcentaje = (totalGastos / presupuesto) * 100;
-              $('#porcentaje').text(porcentaje.toFixed(2) + '%');
-          } else {
-              $('#porcentaje').text('0%');
+          function actualizarPorcentaje() {
+              var presupuestoTexto = $('#presupuesto_usuario').text().replace('$', '').replace(',', '');
+              var totalGastosTexto = $('#total_gastos').text().replace('$', '').replace(',', '');
+              var presupuesto = parseFloat(presupuestoTexto);
+              var totalGastos = parseFloat(totalGastosTexto);
+              if (!isNaN(presupuesto) && !isNaN(totalGastos) && presupuesto !== 0) {
+                  var porcentaje = (totalGastos / presupuesto) * 100;
+                  $('#porcentaje').text(porcentaje.toFixed(2) + '%');
+              } else {
+                  $('#porcentaje').text('0%');
+              }
           }
-      }
-      actualizarPorcentaje();
+          actualizarPorcentaje();
+
           function actualizarPorcentajeA() {
               var ahorroTotalTexto = $('#ahorroTotal').text().replace('$', '').replace(',', '');
               var metaTexto = $('#meta').text().replace('$', '').replace(',', '');
@@ -963,6 +1017,7 @@ if (isset($_POST['registrarAhorro'])) {
               }
           }
           actualizarPorcentajeA();
+
           $('#formDefinirMeta').submit(function(event) {
               event.preventDefault();
               var ahorro = $('#ahorro').val();
