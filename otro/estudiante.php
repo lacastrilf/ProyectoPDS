@@ -116,6 +116,15 @@ function datos($conexion, $idUsuario) {
     return $resultado->fetch_assoc();
 }
 
+// Obtener nombre de usario 
+function nombreUsuarios($conexion, $idUsuario) {
+  $sqlNombre="SELECT * FROM base_usuario WHERE ID='$idUsuario'";
+  $resultado = $conexion->query($sqlNombre);
+  $dato = $resultado->fetch_assoc();
+  $nombreUsario=$dato['nombre'];
+  echo $nombreUsario;
+}
+
 // Actualizar semanas
 if (isset($_POST['actualizarSemanas'])) {
     // Obtener los gastos de la semana
@@ -183,7 +192,7 @@ if (isset($_POST['actualizarSemanas'])) {
     // Reiniciar diagramagastosestudiante a 0
     $sqlReiniciarGastosEstudiante = "UPDATE diagramagastosestudiante SET transporte=0, alimentacion=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario'";
     $conexion->query($sqlReiniciarGastosEstudiante);
-
+    
     header("Location: {$_SERVER['PHP_SELF']}");
 }
 
@@ -324,6 +333,7 @@ if (isset($_POST['registrarAhorro'])) {
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+
                     <span class="d-none d-md-block dropdown-toggle ps-2"><?php
                         if(isset($_SESSION['usuario'])) {
                             echo $_SESSION['usuario'];
@@ -479,7 +489,7 @@ if (isset($_POST['registrarAhorro'])) {
                       <i class="bi bi-cart"></i>
                     </div>
                     <div class="ps-3">
-                      <h6 id="total_gastos">$<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?></h6>
+                      <h6 id="total_gastos"><br>$<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?></h6>
                         <span id="porcentaje" class="text-success small pt-1 fw-bold"></span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
                     </div>
                   </div>
@@ -496,7 +506,8 @@ if (isset($_POST['registrarAhorro'])) {
                       <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div class="ps-3">
-                      <h6 id="presupuesto_usuario">$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
+                      <h6 id="presupuesto_usuario"><br>$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
+                      <br>
                       </div>
                   </div>
                 </div>
@@ -526,7 +537,7 @@ if (isset($_POST['registrarAhorro'])) {
                                   <i class="bi bi-piggy-bank-fill"></i>
                               </div>
                               <div class="ps-3">
-                                  <h6 id="ahorroTotal"><?php echo ($ahorroTotal); ?></h6>
+                                  <h6 id="ahorroTotal">$<?php echo ($ahorroTotal); ?></h6>
                                   <span id="porcentajeA" class="text-success small pt-1 fw-bold"></span><span class="text-muted small pt-2 ps-1">de la meta</span>
                                   <button  type="button" class="btn btn-custom-orange btn-sm" data-bs-toggle="modal" data-bs-target="#modalDefinirMeta">
                                       Definir Meta
@@ -660,7 +671,7 @@ if (isset($_POST['registrarAhorro'])) {
           <div class="col-lg-4">
           <div class="card">
             <div class="card-body pb-0">
-              <h5 class="card-title">Gasto y presupuesto <span> | Semanal</span></h5>
+              <h5 class="card-title">Gasto-Presupuesto <span> | Semanal</span></h5>
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
 
                 <script>

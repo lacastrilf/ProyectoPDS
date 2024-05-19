@@ -62,6 +62,15 @@ if ($resultado->num_rows > 0) {
 $sqlUpdate = "UPDATE diagramagastosestudiante SET transporte ='$totalGastos' WHERE idUsuario = '$idUsuario'";
 $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
 
+// Obtener nombre de usario 
+function nombreUsuarios($conexion, $idUsuario) {
+  $sqlNombre="SELECT * FROM base_usuario WHERE ID='$idUsuario'";
+  $resultado = $conexion->query($sqlNombre);
+  $dato = $resultado->fetch_assoc();
+  $nombreUsario=$dato['nombre'];
+  echo $nombreUsario;
+}
+
 
 ?>
 
@@ -181,46 +190,15 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
+                    <span class="d-none d-md-block dropdown-toggle ps-2"><?php nombreUsuarios($conexion,$idUsuario)?></span>
                 </a><!-- End Profile Iamge Icon -->
 
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
-                        <h6>Kevin Anderson</h6>
+                        <h6><?php nombreUsuarios($conexion,$idUsuario)?></h6>
                         <span>Web Designer</span>
                     </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                            <i class="bi bi-person"></i>
-                            <span>My Profile</span>
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                            <i class="bi bi-gear"></i>
-                            <span>Account Settings</span>
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                            <i class="bi bi-question-circle"></i>
-                            <span>Need Help?</span>
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                    
 
                     <li>
                         <a class="dropdown-item d-flex align-items-center" href="#">
@@ -571,80 +549,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
               </div>
             </div><!-- End Recent Sales -->
 
-            <!-- Top Selling -->
-            <div class="col-12">
-              <div class="card top-selling overflow-auto">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body pb-0">
-                  <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
-                  <table class="table table-borderless">
-                    <thead>
-                      <tr>
-                        <th scope="col">Preview</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Sold</th>
-                        <th scope="col">Revenue</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-1.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
-                        <td>$64</td>
-                        <td class="fw-bold">124</td>
-                        <td>$5,828</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-2.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
-                        <td>$46</td>
-                        <td class="fw-bold">98</td>
-                        <td>$4,508</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-3.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
-                        <td>$59</td>
-                        <td class="fw-bold">74</td>
-                        <td>$4,366</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-4.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
-                        <td>$32</td>
-                        <td class="fw-bold">63</td>
-                        <td>$2,016</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-5.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
-                        <td>$79</td>
-                        <td class="fw-bold">41</td>
-                        <td>$3,239</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                </div>
-
-              </div>
-            </div><!-- End Top Selling -->
-
+       
           </div>
         </div><!-- End Left side columns -->
 
@@ -656,7 +561,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                 <div class="card-body">
                     <h5 class="card-title">Actividad reciente<span>| Esta Semana</span></h5>
 
-                    <div class="activity">
+                    <div class="activity" >
                         <?php
                         $sqlGetEventos = "SELECT * FROM gastosi WHERE id_usuario='$idUsuario' AND tipo='Transporte'";
                         $resultado=mysqli_query($conexion, $sqlGetEventos);
@@ -671,7 +576,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                                     <div class="activite-label"><?php echo($fecha); ?><br><b> <p>$<?php echo($monto); ?></p></b></div>
                                     <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
                                     <div class="activity-content"><?php echo($descripcion); ?> </div>
-
+                                
                                 </div><!-- End activity item-->
                                 <?php
                             }

@@ -55,6 +55,145 @@ if(isset($_POST['enviarPendiente'])){
     $ejecutar3 = mysqli_query($conexion, $sqlInsertPendiente);
     header("Location: {$_SERVER['PHP_SELF']}");
 }
+
+// Creación de fila de la tabla promedio semanas
+$sqlSeleccionSemanas= "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionSemanas);
+if ($resultado->num_rows == 0) {
+    $sqlIngresarSemanas="INSERT INTO semanas VALUES (NULL, '$idUsuario', 0, 0, 0, 0, 0)";
+    $conexion->query($sqlIngresarSemanas);
+}
+
+// Creación de fila de la tabla presupuestos
+$sqlSeleccionPresupuestos= "SELECT * FROM presupuestos WHERE id_usuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionPresupuestos);
+if ($resultado->num_rows == 0) {
+    $sqlIngresarPresupuestos="INSERT INTO presupuestos VALUES ('$idUsuario', 0, 0, 0, 0, 0, 0)";
+    $conexion->query($sqlIngresarPresupuestos);
+}
+
+// Creación de fila de la tabla Ahorro
+$sqlSeleccionAhorro= "SELECT * FROM ahorro WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionAhorro);
+if ($resultado->num_rows == 0) {
+    $sqlIngresarAhorro="INSERT INTO ahorro VALUES (NULL, '$idUsuario', 0, 0)";
+    $conexion->query($sqlIngresarAhorro);
+} else {
+    $datoAhorro = $resultado->fetch_assoc();
+    $ahorroTotal = $datoAhorro['Ahorro'];
+    $meta = $datoAhorro['ahorroEstablecido'];
+}
+
+// Creación de fila de la tabla Grafica ahorro
+$sqlSeleccionGrafica= "SELECT * FROM semanasgastos WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionGrafica);
+if ($resultado->num_rows == 0) {
+    for ($i = 1; $i <= 4; $i++) {
+        $sqlIngresarGrafica="INSERT INTO semanasgastos VALUES (NULL, '$idUsuario', '$i', 0, 0, 0, 0)";
+        $conexion->query($sqlIngresarGrafica);
+    }
+}
+
+function datos($conexion, $idUsuario) {
+    $sqlGastosSemanas = "SELECT * FROM diagramagastoshogar WHERE idUsuario='$idUsuario'";
+    $resultado = $conexion->query($sqlGastosSemanas);
+    return $resultado->fetch_assoc();
+}
+
+// Actualizar semanas
+if (isset($_POST['actualizarSemanas'])) {
+    // Obtener los gastos de la semana
+    $gastosSemanas = datos($conexion, $idUsuario);
+    $transporteGS = $gastosSemanas['transporte'];
+    $ocioGS = $gastosSemanas['ocio'];
+    $colchonGS = $gastosSemanas['colchon'];
+    $alimentacionGS = $gastosSemanas['alimentacion'];
+
+    // Seleccionar las semanas
+    $sqlSeleccionSemanas = "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
+    $resultado = $conexion->query($sqlSeleccionSemanas);
+    $dato = $resultado->fetch_assoc();
+
+    if ($dato['semana1'] == 0) {
+
+        $sqlUpdateSemanas = "UPDATE semanas SET semana1='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+    } elseif ($dato['semana2'] == 0) {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana2='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='2'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+    } elseif ($dato['semana3'] == 0) {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana3='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='3'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+    } elseif ($dato['semana4'] == 0) {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana4='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='4'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+    } else {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana1='$sumaTotalG', semana2=0, semana3=0, semana4=0 WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+        $sqlReiniciarSemanasGastos = "UPDATE semanasgastos SET alimentacion=0, transporte=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario' AND semana IN ('2', '3', '4')";
+        $conexion->query($sqlReiniciarSemanasGastos);
+    }
+
+    // Actualizar Ahorro
+    $sqlSeleccionarAhorro = "SELECT * FROM ahorro WHERE idUsuario='$idUsuario'";
+    $resultado = $conexion->query($sqlSeleccionarAhorro);
+    $dato = $resultado->fetch_assoc();
+    if ($dato) {
+        $ahorro = $sumaTotal - $sumaTotalG + $dato['Ahorro'];
+        $sqlUpdateAhorro = "UPDATE ahorro SET Ahorro='$ahorro' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateAhorro);
+    }
+
+    // Eliminar datos de las tablas para iniciar cada semana
+    $sqlEliminarGastos = "DELETE FROM gastosi WHERE id_usuario='$idUsuario'";
+    $conexion->query($sqlEliminarGastos);
+    $sqlEliminarPendientes = "DELETE FROM pendiente WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlEliminarPendientes);
+    $sqlEliminarEventos = "DELETE FROM eventosespeciales WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlEliminarEventos);
+    $sqlEliminarPresupuestos = "DELETE FROM presupuestos WHERE id_usuario='$idUsuario'";
+    $conexion->query($sqlEliminarPresupuestos);
+
+    // Reiniciar diagramagastosHOGAR a 0
+    $sqlReiniciarGastosHogar = "UPDATE diagramagastoshogar SET transporte=0, alimentacion=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlReiniciarGastosHogar);
+
+    header("Location: {$_SERVER['PHP_SELF']}");
+}
+
+
+// Retirar Ahorros
+if (isset($_POST['retirar'])) {
+    $sqlSeleccionarAhorro = "SELECT * FROM ahorro WHERE idUsuario='$idUsuario'";
+    $resultado = $conexion->query($sqlSeleccionarAhorro);
+    $dato = $resultado->fetch_assoc();
+    $presupuesto = $dato['Ahorro'] + $sumaTotal;
+    $sqlUpdateAhorro = "UPDATE ahorro SET Ahorro=0 WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlUpdateAhorro);
+    $sqlUpdatePresupuestos = "UPDATE presupuestos SET colchon='$presupuesto' WHERE id_usuario='$idUsuario'";
+    $conexion->query($sqlUpdatePresupuestos);
+    header("Location: {$_SERVER['PHP_SELF']}");
+}
+
+// Registrar ahorros
+if (isset($_POST['registrarAhorro'])) {
+    $ahorroEstablecido = $_POST['ahorroEstablecido'];
+    $sqlUpdateAhorro = "UPDATE ahorro SET ahorroEstablecido='$ahorroEstablecido' WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlUpdateAhorro);
+    header("Location: {$_SERVER['PHP_SELF']}");
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -108,12 +247,6 @@ if(isset($_POST['enviarPendiente'])){
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
 
-    <div class="search-bar">
-      <form class="search-form d-flex align-items-center" method="POST" action="#">
-        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
-        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
-      </form>
-    </div><!-- End Search Bar -->
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
@@ -179,96 +312,22 @@ if(isset($_POST['enviarPendiente'])){
               <hr class="dropdown-divider">
             </li>
 
-            <li class="notification-item">
-              <i class="bi bi-info-circle text-primary"></i>
-              <div>
-                <h4>Dicta reprehenderit</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>4 hrs. ago</p>
-              </div>
-            </li>
 
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li class="dropdown-footer">
-              <a href="#">Show all notifications</a>
-            </li>
 
           </ul><!-- End Notification Dropdown Items -->
 
         </li><!-- End Notification Nav -->
 
         <li class="nav-item dropdown">
+           
 
-          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-            <i class="bi bi-chat-left-text"></i>
-            <span class="badge bg-success badge-number">3</span>
-          </a><!-- End Messages Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
-            <li class="dropdown-header">
-              You have 3 new messages
-              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="assets/img/messages-1.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>Maria Hudson</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>4 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="assets/img/messages-2.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>Anna Nelson</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>6 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="assets/img/messages-3.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>David Muldon</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>8 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="dropdown-footer">
-              <a href="#">Show all messages</a>
-            </li>
-
-          </ul><!-- End Messages Dropdown Items -->
+           
 
         </li><!-- End Messages Nav -->
 
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
           </a><!-- End Profile Iamge Icon -->
 
@@ -419,6 +478,20 @@ if(isset($_POST['enviarPendiente'])){
                       <!-- Sales Card -->
                       <div class="col-xxl-4 col-xl-4 col-md-4">
                           <div class="card info-card sales-card">
+                          <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6>Actualizar</h6>
+                    </li>
+                    <li>
+                      <form action="hogar.php" method="POST">
+                      <input type="hidden" value="<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?>" name="presupuestoProm">
+                      <input type="submit" class="dropdown-item" href="#" name="actualizarSemanas" value="Nueva semana" onclick="recargarPaginas()">
+                    </form>
+                    </li>
+                  </ul>
+                </div>
                               <div class="card-body">
                                   <h5 class="card-title">Gastos <span>| Semanales</span></h5>
                                   <div class="d-flex align-items-center">
@@ -426,7 +499,7 @@ if(isset($_POST['enviarPendiente'])){
                                           <i class="bi bi-cart"></i>
                                       </div>
                                       <div class="ps-3">
-                                          <h6 id="total_gastos">$<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?></h6>
+                                          <h6 id="total_gastos">  <br>$<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?></h6>
                                           <span id="porcentaje" class="text-success small pt-1 fw-bold"></span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
                                       </div>
                                   </div>
@@ -438,13 +511,7 @@ if(isset($_POST['enviarPendiente'])){
                       <div class="col-xxl-4 col-xl-4 col-md-4">
                           <div class="card info-card revenue-card">
                               <div class="filter">
-                                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                      <li class="dropdown-header text-start">
-                                          <h6>Actualizar</h6>
-                                      </li>
-
-                                  </ul>
+                            
                               </div>
                               <div class="card-body">
                                   <h5 class="card-title">Presupuesto <span>| Esta Semana</span></h5>
@@ -454,7 +521,8 @@ if(isset($_POST['enviarPendiente'])){
                                           <i class="bi bi-currency-dollar"></i>
                                       </div>
                                       <div class="ps-3">
-                                          <h6 id="presupuesto_usuario" >$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
+                                      <h6 id="presupuesto_usuario"><br>$<?php echo (isset($sumaTotal) ? $sumaTotal : 0); ?></h6>
+                      <br>
                                       </div>
                                   </div>
                               </div>
@@ -470,27 +538,51 @@ if(isset($_POST['enviarPendiente'])){
                               <div class="filter">
                                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                      <li class="dropdown-header text-start">
-                                          <h6>Filter</h6>
-                                      </li>
-                                      <li><a class="dropdown-item" href="#">Today</a></li>
-                                      <li><a class="dropdown-item" href="#">This Month</a></li>
-                                      <li><a class="dropdown-item" href="#">This Year</a></li>
+                                  <li class="dropdown-header text-start">
+                                  <h6>Actualizar</h6>
+                              </li>
+                              <li>
+                                  <form action="hogar.php" method="POST">
+                                      <input type="hidden" value="<?php echo (isset($ahorroTotal) ? $ahorroTotal : 0); ?>" name="ahorroEstablecido">
+                                      <input type="submit" class="dropdown-item" href="#" name="retirar" value="Retirar">
+                                  </form>
+                              </li>
                                   </ul>
                               </div>
                               <div class="card-body">
-                                  <h5 class="card-title">Ahorro <span>| Esta Semana</span></h5>
-
+                              <h5 class="card-title">Ahorro<span> | meta: <span id="meta"><?php echo (isset($meta) ? $meta : 0); ?></span></span></h5>
                                   <div class="d-flex align-items-center">
                                       <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                           <i class="bi bi-piggy-bank-fill"></i>
                                       </div>
                                       <div class="ps-3">
-                                          <h6>1244</h6>
-                                          <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
-
+                                  <h6 id="ahorroTotal">$<?php echo ($ahorroTotal); ?></h6>
+                                  <span id="porcentajeA" class="text-success small pt-1 fw-bold"></span><span class="text-muted small pt-2 ps-1">de la meta</span>
+                                  <button  type="button" class="btn btn-custom-orange btn-sm" data-bs-toggle="modal" data-bs-target="#modalDefinirMeta">
+                                      Definir Meta
+                                  </button>
+                                  <div class="modal fade" id="modalDefinirMeta" tabindex="-1" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h5 class="modal-title">Definir nueva Meta</h5>
+                                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                  <!-- Formulario para poner meta de ahorro-->
+                                                  <form action="hogar.php" method="POST" id="formDefinirMeta">
+                                                      <div class="mb-3">
+                                                          <label for="ahorro">Nueva Meta:</label>
+                                                          <input class="form-control" id="ahorro" name="ahorroEstablecido" type="number" required>
+                                                      </div>
+                                                      <button type="submit" name="registrarAhorro" class="btn btn-success">Registrar</button>
+                                                  </form>
+                                              </div>
+                                          </div>
                                       </div>
                                   </div>
+                              </div>
+                          </div>
 
                               </div>
                           </div>
@@ -519,7 +611,8 @@ if(isset($_POST['enviarPendiente'])){
                           <h5 class="card-title">Pendientes</h5>
 
                           <div class="activity">
-
+                        <div style="height: 400px;">
+         
                 <?php
                 $sqlGetEventos = "SELECT * FROM pendiente WHERE idUsuario='$idUsuario'";
                 $resultado=mysqli_query($conexion, $sqlGetEventos);
@@ -534,13 +627,15 @@ if(isset($_POST['enviarPendiente'])){
                   <div class="activite-label"><?php echo($fechaPendiente); ?><br><b> <p>$<?php echo($montoPendiente); ?></p></b></div>
                   <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
                   <div class="activity-content"><?php echo($nombrePendiente); ?> </div>
-                 
-                </div><!-- End activity item-->
+                  </div><!-- End activity item-->
                 <?php
                    }
                 }
 
                 ?>
+            </div>
+
+
 
                               <div class="modal fade" id="modalAñadirPendientes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                   <div class="modal-dialog">
@@ -629,20 +724,12 @@ if(isset($_POST['enviarPendiente'])){
                   <!-- Website Traffic -->
                   <div class="card">
                       <div class="filter">
-                          <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                              <li class="dropdown-header text-start">
-                                  <h6>Filter</h6>
-                              </li>
-
-                              <li><a class="dropdown-item" href="#">Today</a></li>
-                              <li><a class="dropdown-item" href="#">This Month</a></li>
-                              <li><a class="dropdown-item" href="#">This Year</a></li>
-                          </ul>
+                         
                       </div>
                       <div class="card-body pb-0">
-                          <h5 class="card-title">Gráfico Gastos <span>| Today</span></h5>
+                          <h5 class="card-title">Gráfico Gastos <span>| Semanal</span></h5>
                           <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
+                          <br>
                           <script>
                               document.addEventListener("DOMContentLoaded", () => {
                                   echarts.init(document.querySelector("#trafficChart")).setOption({
@@ -788,153 +875,9 @@ if(isset($_POST['enviarPendiente'])){
               </div><!-- End Reports -->
 
 
-              <!-- Recent Sales -->
-              <div class="col-12">
-                  <div class="card recent-sales overflow-auto">
 
-                      <div class="filter">
-                          <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                              <li class="dropdown-header text-start">
-                                  <h6>Filter</h6>
-                              </li>
 
-                              <li><a class="dropdown-item" href="#">Today</a></li>
-                              <li><a class="dropdown-item" href="#">This Month</a></li>
-                              <li><a class="dropdown-item" href="#">This Year</a></li>
-                          </ul>
-                      </div>
-
-                      <div class="card-body">
-                          <h5 class="card-title">Recent Sales <span>| Today</span></h5>
-
-                          <table class="table table-borderless datatable">
-                              <thead>
-                              <tr>
-                                  <th scope="col">#</th>
-                                  <th scope="col">Customer</th>
-                                  <th scope="col">Product</th>
-                                  <th scope="col">Price</th>
-                                  <th scope="col">Status</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-                              <tr>
-                                  <th scope="row"><a href="#">#2457</a></th>
-                                  <td>Brandon Jacob</td>
-                                  <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                                  <td>$64</td>
-                                  <td><span class="badge bg-success">Approved</span></td>
-                              </tr>
-                              <tr>
-                                  <th scope="row"><a href="#">#2147</a></th>
-                                  <td>Bridie Kessler</td>
-                                  <td><a href="#" class="text-primary">Blanditiis dolor omnis similique</a></td>
-                                  <td>$47</td>
-                                  <td><span class="badge bg-warning">Pending</span></td>
-                              </tr>
-                              <tr>
-                                  <th scope="row"><a href="#">#2049</a></th>
-                                  <td>Ashleigh Langosh</td>
-                                  <td><a href="#" class="text-primary">At recusandae consectetur</a></td>
-                                  <td>$147</td>
-                                  <td><span class="badge bg-success">Approved</span></td>
-                              </tr>
-                              <tr>
-                                  <th scope="row"><a href="#">#2644</a></th>
-                                  <td>Angus Grady</td>
-                                  <td><a href="#" class="text-primar">Ut voluptatem id earum et</a></td>
-                                  <td>$67</td>
-                                  <td><span class="badge bg-danger">Rejected</span></td>
-                              </tr>
-                              <tr>
-                                  <th scope="row"><a href="#">#2644</a></th>
-                                  <td>Raheem Lehner</td>
-                                  <td><a href="#" class="text-primary">Sunt similique distinctio</a></td>
-                                  <td>$165</td>
-                                  <td><span class="badge bg-success">Approved</span></td>
-                              </tr>
-                              </tbody>
-                          </table>
-
-                      </div>
-
-                  </div>
-              </div><!-- End Recent Sales -->
-
-              <!-- Top Selling -->
-              <div class="col-12">
-                  <div class="card top-selling overflow-auto">
-
-                      <div class="filter">
-                          <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                              <li class="dropdown-header text-start">
-                                  <h6>Filter</h6>
-                              </li>
-
-                              <li><a class="dropdown-item" href="#">Today</a></li>
-                              <li><a class="dropdown-item" href="#">This Month</a></li>
-                              <li><a class="dropdown-item" href="#">This Year</a></li>
-                          </ul>
-                      </div>
-
-                      <div class="card-body pb-0">
-                          <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
-                          <table class="table table-borderless">
-                              <thead>
-                              <tr>
-                                  <th scope="col">Preview</th>
-                                  <th scope="col">Product</th>
-                                  <th scope="col">Price</th>
-                                  <th scope="col">Sold</th>
-                                  <th scope="col">Revenue</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-                              <tr>
-                                  <th scope="row"><a href="#"><img src="assets/img/product-1.jpg" alt=""></a></th>
-                                  <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
-                                  <td>$64</td>
-                                  <td class="fw-bold">124</td>
-                                  <td>$5,828</td>
-                              </tr>
-                              <tr>
-                                  <th scope="row"><a href="#"><img src="assets/img/product-2.jpg" alt=""></a></th>
-                                  <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
-                                  <td>$46</td>
-                                  <td class="fw-bold">98</td>
-                                  <td>$4,508</td>
-                              </tr>
-                              <tr>
-                                  <th scope="row"><a href="#"><img src="assets/img/product-3.jpg" alt=""></a></th>
-                                  <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
-                                  <td>$59</td>
-                                  <td class="fw-bold">74</td>
-                                  <td>$4,366</td>
-                              </tr>
-                              <tr>
-                                  <th scope="row"><a href="#"><img src="assets/img/product-4.jpg" alt=""></a></th>
-                                  <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
-                                  <td>$32</td>
-                                  <td class="fw-bold">63</td>
-                                  <td>$2,016</td>
-                              </tr>
-                              <tr>
-                                  <th scope="row"><a href="#"><img src="assets/img/product-5.jpg" alt=""></a></th>
-                                  <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
-                                  <td>$79</td>
-                                  <td class="fw-bold">41</td>
-                                  <td>$3,239</td>
-                              </tr>
-                              </tbody>
-                          </table>
-
-                      </div>
-
-                  </div>
-              </div><!-- End Top Selling -->
+              
           </div><!-- End News & Updates -->
           </div>
           </div>
@@ -959,19 +902,51 @@ if(isset($_POST['enviarPendiente'])){
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script>
       $(document).ready(function() {
-          function actualizarPorcentaje() {
-              var presupuestoTexto = $('#presupuesto_usuario').text().replace('$', '').replace(',', '');
-              var totalGastosTexto = $('#total_gastos').text().replace('$', '').replace(',', '');
-              var presupuesto = parseFloat(presupuestoTexto);
-              var totalGastos = parseFloat(totalGastosTexto);
-              if (!isNaN(presupuesto) && !isNaN(totalGastos) && presupuesto !== 0) {
-                  var porcentaje = (totalGastos / presupuesto) * 100;
-                  $('#porcentaje').text(porcentaje.toFixed(2) + '%');
+      function actualizarPorcentaje() {
+          var presupuestoTexto = $('#presupuesto_usuario').text().replace('$', '').replace(',', '');
+          var totalGastosTexto = $('#total_gastos').text().replace('$', '').replace(',', '');
+          var presupuesto = parseFloat(presupuestoTexto);
+          var totalGastos = parseFloat(totalGastosTexto);
+          if (!isNaN(presupuesto) && !isNaN(totalGastos) && presupuesto !== 0) {
+              var porcentaje = (totalGastos / presupuesto) * 100;
+              $('#porcentaje').text(porcentaje.toFixed(2) + '%');
+          } else {
+              $('#porcentaje').text('0%');
+          }
+      }
+      actualizarPorcentaje();
+          function actualizarPorcentajeA() {
+              var ahorroTotalTexto = $('#ahorroTotal').text().replace('$', '').replace(',', '');
+              var metaTexto = $('#meta').text().replace('$', '').replace(',', '');
+              var ahorroTotal = parseFloat(ahorroTotalTexto);
+              var meta = parseFloat(metaTexto);
+              if (!isNaN(ahorroTotal) && !isNaN(meta) && meta !== 0) {
+                  var porcentaje = (ahorroTotal / meta) * 100;
+                  $('#porcentajeA').text(porcentaje.toFixed(2) + '%');
               } else {
-                  $('#porcentaje').text('0%');
+                  $('#porcentajeA').text('0%');
               }
           }
-          actualizarPorcentaje();
+          actualizarPorcentajeA();
+          $('#formDefinirMeta').submit(function(event) {
+              event.preventDefault();
+              var ahorro = $('#ahorro').val();
+
+              $.ajax({
+                  url: 'hogar.php',
+                  method: 'POST',
+                  data: { ahorroEstablecido: ahorro, registrarAhorro: true },
+                  success: function(response) {
+                      alert('Meta guardada correctamente');
+                      $('#modalDefinirMeta').modal('hide');
+                      location.reload();
+                  },
+                  error: function(xhr, status, error) {
+                      alert('Error al guardar la meta');
+                      console.error(xhr.responseText);
+                  }
+              });
+          });
       });
   </script>
   <!-- Vendor JS Files -->
