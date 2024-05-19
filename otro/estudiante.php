@@ -259,62 +259,66 @@ if (isset($_POST['registrarAhorro'])) {
             <li class="nav-item dropdown">
                 <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                     <i class="bi bi-bell"></i>
-                    <span class="badge bg-primary badge-number">4</span>
+                    <span class="badge bg-primary badge-number" id="notificationCount">4</span>
                 </a><!-- End Notification Icon -->
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-                    <li class="dropdown-header">
-                        You have 4 new notifications
-                        <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="notification-item">
-                        <i class="bi bi-exclamation-circle text-warning"></i>
-                        <div>
-                            <h4>Lorem Ipsum</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>30 min. ago</p>
-                        </div>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="notification-item">
-                        <i class="bi bi-x-circle text-danger"></i>
-                        <div>
-                            <h4>Atque rerum nesciunt</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>1 hr. ago</p>
-                        </div>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="notification-item">
-                        <i class="bi bi-check-circle text-success"></i>
-                        <div>
-                            <h4>Sit rerum fuga</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>2 hrs. ago</p>
-                        </div>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="notification-item">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        <div>
-                            <h4>Dicta reprehenderit</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>4 hrs. ago</p>
-                        </div>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications" aria-labelledby="navbarDropdown" id="notificationDropdown">
+
                 </ul><!-- End Notification Dropdown Items -->
             </li><!-- End Notification Nav -->
+
+            <script>
+                $(document).ready(function() {
+                    // Función para cargar las notificaciones
+                    function loadNotifications() {
+                        $.ajax({
+                            url: 'notificaciones.php',
+                            type: 'GET',
+                            dataType: 'json', // Especificamos que esperamos JSON como respuesta
+                            success: function(response) {
+                                // Actualizar el contador de notificaciones
+                                $('#notificationCount').text(response.length);
+
+                                // Vaciar el contenedor de notificaciones
+                                $('#notificationDropdown').empty();
+
+                                $('#notificationDropdown').append(`
+                    <li class="dropdown-header">
+                            Tienes ${response.length} notificaciones nuevas
+                            <a href="#" style="text-decoration: none;"><span class="badge rounded-pill bg-primary p-2 ms-2" style="opacity: 0; border: none;" disabled>Ver todo</span></a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                `);
+
+                                // Agregar las nuevas notificaciones
+                                response.forEach(function(notification) {
+                                    $('#notificationDropdown').append(`
+                        <li class="notification-item">
+                            <i class="bi bi-${notification.icon} text-${notification.color}"></i>
+                            <div>
+                                <h4>${notification.title}</h4>
+                                <p>${notification.message}</p>
+                                <p>${notification.time}</p>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                    `);
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error al cargar las notificaciones:', error);
+                            }
+                        });
+                    }
+
+                    // Cargar las notificaciones al cargar la página
+                    loadNotifications();
+
+                    // Actualizar las notificaciones cada cierto tiempo (por ejemplo, cada 5 segundos)
+                    setInterval(function() {
+                        loadNotifications();
+                    }, 5000);
+                });
+            </script>
 
 
             <li class="nav-item dropdown pe-3">
