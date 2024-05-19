@@ -8,20 +8,21 @@ $idUsuario = $_SESSION['id_usuario'];
 $conexion = new mysqli("localhost", "root", "", "base_proyecto");
 
 //Obtener la suma de todos los presupuestos
-$sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + servicios + transporte + vivienda) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
+$sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + transporte) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultadoSuma = $conexion->query($sqlSuma);
 $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'] ?? 0;
 
 //obtener cada presupuesto para la grafica
-$sqlCategorias = "SELECT alimentacion AS alimentacion, transporte AS transporte, ocio AS ocio FROM presupuestos WHERE id_usuario='$idUsuario'";
+$sqlCategorias = "SELECT alimentacion AS alimentacion, transporte AS transporte, ocio AS ocio , colchon AS colchon FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultadoCategorias = $conexion->query($sqlCategorias);
 $categorias = $resultadoCategorias->fetch_assoc() ?? ['alimentacion' => 0, 'transporte' => 0, 'ocio' => 0];
 $gAlimentacion = $categorias['alimentacion'];
 $gTransporte = $categorias['transporte'];
 $gOcio = $categorias['ocio'];
+$gColchon = $categorias['colchon'];
 
 //Obtener la suma total de los gastos
-$sqlSumaG = "SELECT SUM(transporte+alimentacion+ocio) AS suma_total FROM diagramagastosestudiante WHERE idUsuario='$idUsuario'";
+$sqlSumaG = "SELECT SUM(transporte+alimentacion+ocio+colchon) AS suma_total FROM diagramagastosestudiante WHERE idUsuario='$idUsuario'";
 $resultadoSumaG= $conexion->query($sqlSumaG);
 $sumaTotalG = $resultadoSumaG->fetch_assoc()['suma_total'];
 
@@ -38,6 +39,7 @@ if($dato){
   $alimentacionGrafico=$dato['alimentacion'];
   $transporteGrafico=$dato['transporte'];
   $ocioGrafico=$dato['ocio'];
+    $colchonGrafico = $dato['colchon'];
 }
 
 //Ingresar pendientes de la semana
@@ -50,154 +52,141 @@ if(isset($_POST['enviarPendiente'])){
     header("Location: {$_SERVER['PHP_SELF']}");
 }
 
-//Creación de fila de la tabla promedio semanas
+// Creación de fila de la tabla promedio semanas
 $sqlSeleccionSemanas= "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccionSemanas);
 if ($resultado->num_rows == 0) {
-    $sqlIngresarSemanas="INSERT INTO semanas VALUES ('null', '$idUsuario', '0', '0', '0', '0','0')";
-    $ejecutar4 = mysqli_query($conexion, $sqlIngresarSemanas);
+    $sqlIngresarSemanas="INSERT INTO semanas VALUES (NULL, '$idUsuario', 0, 0, 0, 0, 0)";
+    $conexion->query($sqlIngresarSemanas);
 }
 
-//Creación de fila de la tabla presupuestos
+// Creación de fila de la tabla presupuestos
 $sqlSeleccionPresupuestos= "SELECT * FROM presupuestos WHERE id_usuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccionPresupuestos);
 if ($resultado->num_rows == 0) {
-    $sqlIngresarPresupuestos="INSERT INTO presupuestos VALUES ('$idUsuario', '0', '0', '0', '0','0','0')";
-    $ejecutar12 = mysqli_query($conexion, $sqlIngresarPresupuestos);
+    $sqlIngresarPresupuestos="INSERT INTO presupuestos VALUES ('$idUsuario', 0, 0, 0, 0, 0, 0)";
+    $conexion->query($sqlIngresarPresupuestos);
 }
 
-//Creación de fila de la tabla Ahorro
+// Creación de fila de la tabla Ahorro
 $sqlSeleccionAhorro= "SELECT * FROM ahorro WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccionAhorro);
 if ($resultado->num_rows == 0) {
-    $sqlIngresarAhorro="INSERT INTO ahorro VALUES ('null', '$idUsuario', '0', '0')";
-    $ejecutar4 = mysqli_query($conexion, $sqlIngresarAhorro);
-}
-else{
-  $datoAhorro=$resultado->fetch_assoc();
-  $ahorroTotal=$datoAhorro['Ahorro'];
+    $sqlIngresarAhorro="INSERT INTO ahorro VALUES (NULL, '$idUsuario', 0, 0)";
+    $conexion->query($sqlIngresarAhorro);
+} else {
+    $datoAhorro = $resultado->fetch_assoc();
+    $ahorroTotal = $datoAhorro['Ahorro'];
+    $meta = $datoAhorro['ahorroEstablecido'];
 }
 
-//Creación de fila de la tabla Grafica ahorro
+// Creación de fila de la tabla Grafica ahorro
 $sqlSeleccionGrafica= "SELECT * FROM semanasgastos WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccionGrafica);
 if ($resultado->num_rows == 0) {
-  $i=1;
-  while($i<5){
-    $sqlIngresarGrafica="INSERT INTO semanasgastos VALUES ('null', '$idUsuario', '$i', '0','0','0','0')";
-    $ejecutar14 = mysqli_query($conexion, $sqlIngresarGrafica);
-    $i=$i+1;
-  }
+    for ($i = 1; $i <= 4; $i++) {
+        $sqlIngresarGrafica="INSERT INTO semanasgastos VALUES (NULL, '$idUsuario', '$i', 0, 0, 0, 0)";
+        $conexion->query($sqlIngresarGrafica);
+    }
 }
 
-  function datos($conexion, $idUsuario){
-    $sqlGastosSemanas="SELECT * FROM diagramagastosestudiante WHERE idUsuario='$idUsuario'";
+function datos($conexion, $idUsuario) {
+    $sqlGastosSemanas = "SELECT * FROM diagramagastosestudiante WHERE idUsuario='$idUsuario'";
     $resultado = $conexion->query($sqlGastosSemanas);
-    $datoGastos = $resultado->fetch_assoc(); 
-    return $datoGastos;
-  }
-
-
-//Actualizar semanas
-if(isset($_POST['actualizarSemanas'])){
-
-  //Seleccion de gastos por semana
-
-  $alimentacionGS=datos($conexion, $idUsuario);
-  $transporteGS=$alimentacionGS['transporte'];;
-  $ocioGS=$alimentacionGS['ocio'];;
-  $colchonGS=$alimentacionGS['colchon'];;
-  $alimentacionGS=$alimentacionGS['alimentacion'];
-
-
-
-
-  $sqlSeleccionSemanas= "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
-  $resultado = $conexion->query($sqlSeleccionSemanas);
-  $dato = $resultado->fetch_assoc();
-  if($dato['semana1']==0){
-    $sqlUpdateSemanas= "UPDATE semanas SET semana1='$sumaTotalG' WHERE idUsuario='$idUsuario'";
-    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
-    $sqlUpdatePresupuestosGS= "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
-    $ejecutar15= mysqli_query($conexion, $sqlUpdatePresupuestosGS);
-    
-  }
-  else if($dato['semana2']==0){
-    $sqlUpdateSemanas= "UPDATE semanas SET semana2='$sumaTotalG' WHERE idUsuario='$idUsuario'";
-    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
-    $sqlUpdatePresupuestosGS= "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='2'";
-    $ejecutar15= mysqli_query($conexion, $sqlUpdatePresupuestosGS);
-    
-  }
-  else if($dato['semana3']==0){
-    $sqlUpdateSemanas= "UPDATE semanas SET semana3='$sumaTotalG' WHERE idUsuario='$idUsuario'";
-    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
-    $sqlUpdatePresupuestosGS= "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='3'";
-    $ejecutar15= mysqli_query($conexion, $sqlUpdatePresupuestosGS);
-  }
-  else if($dato['semana4']==0){
-    $sqlUpdateSemanas= "UPDATE semanas SET semana4='$sumaTotalG' WHERE idUsuario='$idUsuario'";
-    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
-    $sqlUpdatePresupuestosGS= "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='4'";
-    $ejecutar15= mysqli_query($conexion, $sqlUpdatePresupuestosGS);
-  }
-  else{
-    echo("Reiniciar semanas");
-    $sqlUpdateSemanas= "UPDATE semanas SET semana1=0, semana2=0, semana3=0, semana4=0 WHERE idUsuario='$idUsuario'";
-    $ejecutar5 = mysqli_query($conexion, $sqlUpdateSemanas);
-    
-  }
-  
-
-  //Update Ahorro
-  $sqlSeleccionarAhorro="SELECT * FROM ahorro WHERE idUsuario='$idUsuario'";
-  $resultado = $conexion->query($sqlSeleccionarAhorro);
-  $dato = $resultado->fetch_assoc();
-  if($dato){
-    $ahorro=$sumaTotal-$sumaTotalG+$dato['Ahorro'];
-    $sqlUpdateAhorro= "UPDATE ahorro SET ahorro='$ahorro' WHERE idUsuario='$idUsuario'";
-    $ejecutar10 = mysqli_query($conexion, $sqlUpdateAhorro);
-   
-  }
-
-
-  //Eliminar datos de las tablas para iniciar cada semana 
-  $sqlEliminarGastos="DELETE FROM gastosi WHERE id_usuario='$idUsuario'";
-  $ejecutar6 = mysqli_query($conexion, $sqlEliminarGastos);
-  $sqlEliminarPendientes="DELETE FROM pendiente WHERE idUsuario='$idUsuario'";
-  $ejecutar7 = mysqli_query($conexion, $sqlEliminarPendientes);
-  $sqlEliminarEventos="DELETE FROM eventosespeciales WHERE idUsuario='$idUsuario'";
-  $ejecutar8 = mysqli_query($conexion, $sqlEliminarEventos);
-  $sqlEliminarPresupuestos="DELETE FROM presupuestos WHERE id_usuario='$idUsuario'";
-  $ejecutar9 = mysqli_query($conexion, $sqlEliminarPresupuestos);
-  header("Location: {$_SERVER['PHP_SELF']}");
-
+    return $resultado->fetch_assoc();
 }
 
-  //Retirar Ahorros
-  if(isset($_POST['retirar'])){
-    $sqlSeleccionarAhorro="SELECT * FROM ahorro WHERE idUsuario='$idUsuario'";
+// Actualizar semanas
+if (isset($_POST['actualizarSemanas'])) {
+    // Obtener los gastos de la semana
+    $gastosSemanas = datos($conexion, $idUsuario);
+    $transporteGS = $gastosSemanas['transporte'];
+    $ocioGS = $gastosSemanas['ocio'];
+    $colchonGS = $gastosSemanas['colchon'];
+    $alimentacionGS = $gastosSemanas['alimentacion'];
+
+    // Seleccionar las semanas
+    $sqlSeleccionSemanas = "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
+    $resultado = $conexion->query($sqlSeleccionSemanas);
+    $dato = $resultado->fetch_assoc();
+
+    if ($dato['semana1'] == 0) {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana1='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+    } elseif ($dato['semana2'] == 0) {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana2='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='2'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+    } elseif ($dato['semana3'] == 0) {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana3='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='3'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+    } elseif ($dato['semana4'] == 0) {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana4='$sumaTotalG' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='4'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+    } else {
+        $sqlUpdateSemanas = "UPDATE semanas SET semana1='$sumaTotalG', semana2=0, semana3=0, semana4=0 WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateSemanas);
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
+        $conexion->query($sqlUpdatePresupuestosGS);
+        $sqlReiniciarSemanasGastos = "UPDATE semanasgastos SET alimentacion=0, transporte=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario' AND semana IN ('2', '3', '4')";
+        $conexion->query($sqlReiniciarSemanasGastos);
+    }
+
+    // Actualizar Ahorro
+    $sqlSeleccionarAhorro = "SELECT * FROM ahorro WHERE idUsuario='$idUsuario'";
     $resultado = $conexion->query($sqlSeleccionarAhorro);
     $dato = $resultado->fetch_assoc();
-    $presupuesto=0;
-    $presupuesto=$dato['Ahorro']+$sumaTotal;
-    $sqlUpdateAhorro= "UPDATE ahorro SET Ahorro=0 WHERE idUsuario='$idUsuario'";
-    $ejecutar10 = mysqli_query($conexion, $sqlUpdateAhorro);
-    $sqlUpdatePresupuestos= "UPDATE presupuestos SET colchon='$presupuesto' WHERE id_usuario='$idUsuario'";
-    $ejecutar11 = mysqli_query($conexion, $sqlUpdatePresupuestos);
+    if ($dato) {
+        $ahorro = $sumaTotal - $sumaTotalG + $dato['Ahorro'];
+        $sqlUpdateAhorro = "UPDATE ahorro SET Ahorro='$ahorro' WHERE idUsuario='$idUsuario'";
+        $conexion->query($sqlUpdateAhorro);
+    }
+
+    // Eliminar datos de las tablas para iniciar cada semana
+    $sqlEliminarGastos = "DELETE FROM gastosi WHERE id_usuario='$idUsuario'";
+    $conexion->query($sqlEliminarGastos);
+    $sqlEliminarPendientes = "DELETE FROM pendiente WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlEliminarPendientes);
+    $sqlEliminarEventos = "DELETE FROM eventosespeciales WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlEliminarEventos);
+    $sqlEliminarPresupuestos = "DELETE FROM presupuestos WHERE id_usuario='$idUsuario'";
+    $conexion->query($sqlEliminarPresupuestos);
+
+    // Reiniciar diagramagastosestudiante a 0
+    $sqlReiniciarGastosEstudiante = "UPDATE diagramagastosestudiante SET transporte=0, alimentacion=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlReiniciarGastosEstudiante);
+
     header("Location: {$_SERVER['PHP_SELF']}");
-  }
+}
 
-  //Registrar ahorros
-  if(isset($_POST['registrarAhorro'])){
-    $ahorroEstablecido=$_POST['ahorroEstablecido'];
-    $sqlUpdateAhorro= "UPDATE ahorro SET ahorroEstablecido='$ahorroEstablecido' WHERE idUsuario='$idUsuario'";
-    $ejecutar13 = mysqli_query($conexion, $sqlUpdateAhorro);
+
+// Retirar Ahorros
+if (isset($_POST['retirar'])) {
+    $sqlSeleccionarAhorro = "SELECT * FROM ahorro WHERE idUsuario='$idUsuario'";
+    $resultado = $conexion->query($sqlSeleccionarAhorro);
+    $dato = $resultado->fetch_assoc();
+    $presupuesto = $dato['Ahorro'] + $sumaTotal;
+    $sqlUpdateAhorro = "UPDATE ahorro SET Ahorro=0 WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlUpdateAhorro);
+    $sqlUpdatePresupuestos = "UPDATE presupuestos SET colchon='$presupuesto' WHERE id_usuario='$idUsuario'";
+    $conexion->query($sqlUpdatePresupuestos);
     header("Location: {$_SERVER['PHP_SELF']}");
-  }
- 
+}
 
-
+// Registrar ahorros
+if (isset($_POST['registrarAhorro'])) {
+    $ahorroEstablecido = $_POST['ahorroEstablecido'];
+    $sqlUpdateAhorro = "UPDATE ahorro SET ahorroEstablecido='$ahorroEstablecido' WHERE idUsuario='$idUsuario'";
+    $conexion->query($sqlUpdateAhorro);
+    header("Location: {$_SERVER['PHP_SELF']}");
+}
 
 ?>
 
@@ -531,19 +520,13 @@ if(isset($_POST['actualizarSemanas'])){
                     <li>
                       <form action="estudiante.php" method="POST">
                       <input type="hidden" value="<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?>" name="presupuestoProm">
-                      <input type="submit" class="dropdown-item" href="#" name="actualizarSemanas" value="Nueva semana">
-                    </form></li>
+                      <input type="submit" class="dropdown-item" href="#" name="actualizarSemanas" value="Nueva semana" onclick="recargarPaginas()">
+                    </form>
+                    </li>
                   </ul>
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title"><?php   
-  $sqlGastosSemanas="SELECT * FROM diagramagastosestudiante WHERE idUsuario='$idUsuario'";
-  $resultado = $conexion->query($sqlGastosSemanas);
-  $datoGastos = $resultado->fetch_assoc(); 
-  echo($datoGastos['alimentacion']);
-  ?>
-
-  <span>| Semanales</span></h5>
+                  <h5 class="card-title">Gastos <span>| Semanales</span></h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-cart"></i>
@@ -559,15 +542,6 @@ if(isset($_POST['actualizarSemanas'])){
             <!-- Revenue Card -->
             <div class="col-xxl-4 col-xl-4 col-md-4">
               <div class="card info-card revenue-card">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Actualizar</h6>
-                    </li>
-                   
-                  </ul>
-                </div>
                 <div class="card-body">
                   <h5 class="card-title"> Presupuesto <span>| Esta semana</span></h5>
                   <div class="d-flex align-items-center">
@@ -582,48 +556,61 @@ if(isset($_POST['actualizarSemanas'])){
               </div>
             </div><!-- End Revenue Card -->
             <!-- Customers Card -->
-            <div class="col-xxl-4 col-xl-4 col-md-4">
-              <div class="card info-card customers-card">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-                    <li><a class="dropdown-item" href="#" >Actualizar</a></li>
-                    <li>
-                      <form action="estudiante.php" method="POST">
-                      <input type="hidden" value="<?php echo (isset($ahorroTotal) ? $ahorroTotal : 0); ?>" name="ahorroEstablecido">
-                      <input type="submit" class="dropdown-item" href="#" name="retirar" value="Retirar">
-                      </form>
-                    </li>
-                  </ul>
-                </div>
-                <div class="card-body">
-                  <h5 class="card-title">Ahorro <span>| Meta</span></h5>
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-piggy-bank-fill"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6><?php echo ($ahorroTotal) ?></h6>
-                      <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
-                    </div>
+              <div class="col-xxl-4 col-xl-4 col-md-4">
+                  <div class="card info-card customers-card">
+                      <div class="filter">
+                          <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                              <li class="dropdown-header text-start">
+                                  <h6>Actualizar</h6>
+                              </li>
+                              <li>
+                                  <form action="estudiante.php" method="POST">
+                                      <input type="hidden" value="<?php echo (isset($ahorroTotal) ? $ahorroTotal : 0); ?>" name="ahorroEstablecido">
+                                      <input type="submit" class="dropdown-item" href="#" name="retirar" value="Retirar">
+                                  </form>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="card-body">
+                          <h5 class="card-title">Ahorro<span> | meta: <span id="meta"><?php echo (isset($meta) ? $meta : 0); ?></span></span></h5>
+                          <div class="d-flex align-items-center">
+                              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                  <i class="bi bi-piggy-bank-fill"></i>
+                              </div>
+                              <div class="ps-3">
+                                  <h6 id="ahorroTotal"><?php echo ($ahorroTotal); ?></h6>
+                                  <span id="porcentajeA" class="text-success small pt-1 fw-bold"></span><span class="text-muted small pt-2 ps-1">de la meta</span>
+                                  <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalDefinirMeta">
+                                      Definir Meta
+                                  </button>
+                                  <div class="modal fade" id="modalDefinirMeta" tabindex="-1" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h5 class="modal-title">Definir nueva Meta</h5>
+                                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                              </div>
+                                              <div class="modal-body">
+                                                  <!-- Formulario para poner meta de ahorro-->
+                                                  <form action="estudiante.php" method="POST" id="formDefinirMeta">
+                                                      <div class="mb-3">
+                                                          <label for="ahorro">Nueva Meta:</label>
+                                                          <input class="form-control" id="ahorro" name="ahorroEstablecido" type="number" required>
+                                                      </div>
+                                                      <button type="submit" name="registrarAhorro" class="btn btn-success">Registrar</button>
+                                                  </form>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                   </div>
-
-                  <form action="estudiante.php" method="POST">
-                    <label>cuanto ahorro</label>
-                    <input type="number" name="ahorroEstablecido">
-                    <input type="submit" value="Enviar" name="registrarAhorro">
-                  </form>
-                </div>
               </div>
-            </div>
-          </div>
-        </div>
-         
 
-        <div class="row">
+              <div class="row">
             <div class="col-lg-4">
           <div class="card">
             <div class="filter">
@@ -783,6 +770,7 @@ if(isset($_POST['actualizarSemanas'])){
                           value:<?php echo ($ocioGrafico);?>,
                           name: 'Ocio'
                         },
+                          
                         
                       ]
                     }]
@@ -852,7 +840,7 @@ if(isset($_POST['actualizarSemanas'])){
                         markers: {
                           size: 4
                         },
-                        colors: ['#4154f1', '#2eca6a', '#ff771d','#F930FF'],
+                        colors: ['#4154f1', '#2eca6a', '#ff771d','#ff3067'],
                         fill: {
                           type: "gradient",
                           gradient: {
@@ -1055,6 +1043,38 @@ if(isset($_POST['actualizarSemanas'])){
           }
       }
       actualizarPorcentaje();
+          function actualizarPorcentajeA() {
+              var ahorroTotalTexto = $('#ahorroTotal').text().replace('$', '').replace(',', '');
+              var metaTexto = $('#meta').text().replace('$', '').replace(',', '');
+              var ahorroTotal = parseFloat(ahorroTotalTexto);
+              var meta = parseFloat(metaTexto);
+              if (!isNaN(ahorroTotal) && !isNaN(meta) && meta !== 0) {
+                  var porcentaje = (ahorroTotal / meta) * 100;
+                  $('#porcentajeA').text(porcentaje.toFixed(2) + '%');
+              } else {
+                  $('#porcentajeA').text('0%');
+              }
+          }
+          actualizarPorcentajeA();
+          $('#formDefinirMeta').submit(function(event) {
+              event.preventDefault();
+              var ahorro = $('#ahorro').val();
+
+              $.ajax({
+                  url: 'estudiante.php',
+                  method: 'POST',
+                  data: { ahorroEstablecido: ahorro, registrarAhorro: true },
+                  success: function(response) {
+                      alert('Meta guardada correctamente');
+                      $('#modalDefinirMeta').modal('hide');
+                      location.reload();
+                  },
+                  error: function(xhr, status, error) {
+                      alert('Error al guardar la meta');
+                      console.error(xhr.responseText);
+                  }
+              });
+          });
       });
   </script>
 
