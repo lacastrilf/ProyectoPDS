@@ -15,7 +15,7 @@ $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'] ?? 0;
 //obtener cada presupuesto para la grafica
 $sqlCategorias = "SELECT alimentacion AS alimentacion, transporte AS transporte, ocio AS ocio , colchon AS colchon FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultadoCategorias = $conexion->query($sqlCategorias);
-$categorias = $resultadoCategorias->fetch_assoc() ?? ['alimentacion' => 0, 'transporte' => 0, 'ocio' => 0];
+$categorias = $resultadoCategorias->fetch_assoc() ?? ['alimentacion' => 0, 'transporte' => 0, 'ocio' => 0, 'colchon' => 0];
 $gAlimentacion = $categorias['alimentacion'];
 $gTransporte = $categorias['transporte'];
 $gOcio = $categorias['ocio'];
@@ -111,6 +111,7 @@ if (isset($_POST['actualizarSemanas'])) {
     $dato = $resultado->fetch_assoc();
 
     if ($dato['semana1'] == 0) {
+
         $sqlUpdateSemanas = "UPDATE semanas SET semana1='$sumaTotalG' WHERE idUsuario='$idUsuario'";
         $conexion->query($sqlUpdateSemanas);
         $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
@@ -189,9 +190,6 @@ if (isset($_POST['registrarAhorro'])) {
 }
 
 ?>
-
-
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -581,7 +579,7 @@ if (isset($_POST['registrarAhorro'])) {
                               <div class="ps-3">
                                   <h6 id="ahorroTotal"><?php echo ($ahorroTotal); ?></h6>
                                   <span id="porcentajeA" class="text-success small pt-1 fw-bold"></span><span class="text-muted small pt-2 ps-1">de la meta</span>
-                                  <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalDefinirMeta">
+                                  <button  type="button" class="btn btn-custom-orange btn-sm" data-bs-toggle="modal" data-bs-target="#modalDefinirMeta">
                                       Definir Meta
                                   </button>
                                   <div class="modal fade" id="modalDefinirMeta" tabindex="-1" aria-hidden="true">

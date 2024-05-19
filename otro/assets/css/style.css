@@ -1231,3 +1231,14 @@ h6 {
   font-size: 13px;
   color: #012970;
 }
+
+.btn-custom-orange {
+  color: orange;
+  border-color: orange;
+}
+
+.btn-custom-orange:hover {
+  color: #fff;
+  background-color: darkorange;
+  border-color: darkorange;
+}
