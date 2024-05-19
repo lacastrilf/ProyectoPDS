@@ -181,7 +181,6 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
                     <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
                 </a><!-- End Profile Iamge Icon -->
 
@@ -327,7 +326,22 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                                   <form id="formNuevoGasto">
                                       <div class="mb-3">
                                           <label for="gasto">Monto:</label>
-                                          <input type="number" class="form-control" id="gasto" name="gasto" min="0" required>
+                                          <input type="number" class="form-control" id="gasto" name="gasto" min="0" required oninput="checkMax(this, <?php echo $presupuesto; ?>)">
+                                          <div id="mensaje-error" class="mensaje-error"></div>
+                                          <script>
+                                              function checkMax(input, presupuesto) {
+                                                  var value = parseFloat(input.value);
+                                                  var mensajeError = document.getElementById('mensaje-error');
+                                                  if (value > presupuesto) {
+                                                      mensajeError.innerText = "El valor no puede ser mayor que el presupuesto de <?php echo $presupuesto; ?>";
+                                                      input.value = presupuesto;
+                                                      mensajeError.style.opacity = 1;
+                                                  } else {
+                                                      mensajeError.innerText = "";
+                                                      mensajeError.style.opacity = 0;
+                                                  }
+                                              }
+                                          </script>
                                       </div>
                                       <div class="mb-3">
                                           <label for="descripcion">Descripción:</label>
@@ -340,19 +354,19 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                       </div>
                   </div>
 
-                <div class="card-body">
-                  <h5 class="card-title">Gastos realizados</h5>
+                  <div class="card-body">
+                      <h5 class="card-title">Gastos realizados</h5>
 
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
-                    </div>
-                      <div class="ps-3">
-                          <h6 id="total_gastos" >$<?php echo $totalGastos == 0 ? '0' : $totalGastos; ?></h6></h6>
-                          <span id="porcentaje" class="text-success small pt-1 fw-bold"></span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
+                      <div class="d-flex align-items-center">
+                          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                              <i class="bi bi-cart"></i>
+                          </div>
+                          <div class="ps-3">
+                              <h6 id="total_gastos" >$<?php echo $totalGastos == 0 ? '0' : $totalGastos; ?></h6></h6>
+                              <span id="porcentaje" class="text-success small pt-1 fw-bold"></span> <span class="text-muted small pt-2 ps-1">del presupuesto</span>
+                          </div>
                       </div>
                   </div>
-                </div>
 
               </div>
             </div><!-- End Sales Card -->
@@ -385,22 +399,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                                                   <form id="formEditarPresupuesto">
                                                       <div class="mb-3">
                                                           <label for="presupuesto">Nuevo Presupuesto:</label>
-                                                          <input type="number" class="form-control" id="gasto" name="gasto" min="0" required oninput="checkMax(this, <?php echo $presupuesto; ?>)">
-                                                          <div id="mensaje-error" class="mensaje-error"></div>
-                                                          <script>
-                                                              function checkMax(input, presupuesto) {
-                                                                  var value = parseFloat(input.value);
-                                                                  var mensajeError = document.getElementById('mensaje-error');
-                                                                  if (value > presupuesto) {
-                                                                      mensajeError.innerText = "El valor no puede ser mayor que el presupuesto de <?php echo $presupuesto; ?>";
-                                                                      input.value = presupuesto;
-                                                                      mensajeError.style.opacity = 1;
-                                                                  } else {
-                                                                      mensajeError.innerText = "";
-                                                                      mensajeError.style.opacity = 0;
-                                                                  }
-                                                              }
-                                                          </script>
+                                                          <input class="form-control" id="presupuesto" name="presupuesto" type="number" min="0" required>
                                                       </div>
                                                       <button type="submit" class="btn btn-success">Guardar</button>
                                                   </form>
@@ -410,11 +409,11 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                                   </div>
 
                               </div>
-                  </div>
-                </div>
+                          </div>
+                      </div>
 
-              </div>
-            </div><!-- End Revenue Card -->
+                  </div>
+              </div><!-- End Revenue Card -->
 
             <!-- Reports -->
             <div class="col-12">
