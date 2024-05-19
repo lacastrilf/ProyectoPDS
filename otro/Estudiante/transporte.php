@@ -869,8 +869,8 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                   data: { presupuesto: presupuesto },
                   success: function(response) {
                       alert('Presupuesto guardado correctamente');
-                      $('#presupuesto_usuario').text("$" +presupuesto);
                       $('#modalEditarPresupuesto').modal('hide');
+                      location.reload();
                   },
                   error: function(xhr, status, error) {
                       alert('Error al guardar el presupuesto');
@@ -889,10 +889,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                   success: function(response) {
                       alert('Gasto guardado correctamente');
                       $('#modalAñadirGasto').modal('hide');
-                      var totalActual = parseFloat($('#total_gastos').text().replace('$', ''));
-                      var nuevoTotal = totalActual + parseFloat(monto);
-                      $('#total_gastos').text('$' + nuevoTotal);
-                      actualizarPorcentaje();
+                      location.reload();
                   },
                   error: function(xhr, status, error) {
                       alert('Error al guardar el gasto');
