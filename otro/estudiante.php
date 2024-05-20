@@ -749,7 +749,9 @@ if($datoAhorro){
 
           <div class="col-lg-4">
           <div class="card">
+         
             <div class="card-body pb-0">
+              
               <h5 class="card-title">Gasto-Presupuesto <span> | Semanal</span></h5>
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
 
