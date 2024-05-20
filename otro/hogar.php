@@ -31,7 +31,7 @@ $sumaTotalG = $resultadoSumaG->fetch_assoc()['suma_total'];
 $sqlSeleccion = "SELECT * FROM diagramagastoshogar WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccion);
 if ($resultado->num_rows == 0) {
-    $sqlIngresar = "INSERT INTO diagramagastoshogar VALUES ('null', '$idUsuario', '0', '0', '0', '0', '0')";
+    $sqlIngresar = "INSERT INTO diagramagastoshogar VALUES ('null', '$idUsuario', '0', '0', '0', '0', '0','0')";
     $ejecutar3 = mysqli_query($conexion, $sqlIngresar);
 }
 $resultado = $conexion->query($sqlSeleccion);
@@ -82,14 +82,18 @@ if ($resultado->num_rows == 0) {
     $meta = $datoAhorro['ahorroEstablecido'];
 }
 
-// Creación de fila de la tabla Grafica ahorro
-$sqlSeleccionGrafica= "SELECT * FROM semanasgastosh WHERE idUsuario = '$idUsuario'";
-$resultado = $conexion->query($sqlSeleccionGrafica);
+// Creación de fila de la tabla Ahorro
+$sqlSeleccionAhorro= "SELECT * FROM ahorro WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionAhorro);
 if ($resultado->num_rows == 0) {
-    for ($i = 1; $i <= 4; $i++) {
-        $sqlIngresarGrafica="INSERT INTO semanasgastosh VALUES (NULL, '$idUsuario', '$i', 0, 0, 0,0,0,0)";
-        $conexion->query($sqlIngresarGrafica);
-    }
+    $sqlIngresarAhorro="INSERT INTO ahorro VALUES (NULL, '$idUsuario', 0, 0)";
+    $conexion->query($sqlIngresarAhorro);
+}
+$resultado = $conexion->query($sqlSeleccionAhorro);
+$datoAhorro = $resultado->fetch_assoc();
+if($datoAhorro){
+    $ahorroTotal = $datoAhorro['Ahorro'];
+    $meta = $datoAhorro['ahorroEstablecido'];
 }
 
 function datos($conexion, $idUsuario) {
@@ -108,8 +112,9 @@ if (isset($_POST['actualizarSemanas'])) {
     $ocioGS = $gastosSemanas['ocio'];
     $colchonGS = $gastosSemanas['colchon'];
     $alimentacionGS = $gastosSemanas['alimentacion'];
-    $viviendaGS=$datosSemanales['vivienda'];
-    $estudianteGS=$datosSemanales['estudiante'];
+    $datosSemanales = 0;
+    $viviendaGS= $datosSemanales['vivienda'];
+    $estudianteGS= $datosSemanales['estudiante'];
 
     // Seleccionar las semanas
     $sqlSeleccionSemanas = "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
