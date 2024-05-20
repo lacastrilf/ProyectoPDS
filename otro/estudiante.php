@@ -51,19 +51,35 @@ if(isset($_POST['enviarPendiente'])){
   $ejecutar3 = mysqli_query($conexion, $sqlInsertPendiente);
     header("Location: {$_SERVER['PHP_SELF']}");
 }
-
 // Manejo de solicitud AJAX para eliminar pendientes
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['accion']) && $_POST['accion'] == 'eliminar') {
     $idPendiente = $_POST['idPendiente'];
 
-    // Eliminar el pendiente
-    $sqlDeletePendiente = "DELETE FROM pendiente WHERE id = ?";
-    $stmt = $conexion->prepare($sqlDeletePendiente);
-    $stmt->bind_param("i", $idPendiente);
+    // Iniciar una transacción
+    $conexion->begin_transaction();
 
-    if ($stmt->execute()) {
+    try {
+        // Eliminar el pendiente
+        $sqlDeletePendiente = "DELETE FROM pendiente WHERE id = ?";
+        $stmt = $conexion->prepare($sqlDeletePendiente);
+        $stmt->bind_param("i", $idPendiente);
+
+        if (!$stmt->execute()) {
+            throw new Exception('Error al eliminar el pendiente');
+        }
+
+        // Eliminar las notificaciones correspondientes al pendiente eliminado
+        $sqlEliminarNotificacion = "DELETE FROM notificaciones WHERE id_usuario='$idUsuario' AND tipo='$idPendiente'";
+        if (!$conexion->query($sqlEliminarNotificacion)) {
+            throw new Exception('Error al eliminar la notificación');
+        }
+
+        // Confirmar la transacción
+        $conexion->commit();
         echo 'success';
-    } else {
+    } catch (Exception $e) {
+        // Revertir la transacción en caso de error
+        $conexion->rollback();
         echo 'error';
     }
 
@@ -71,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['accion']) && $_POST['a
     $conexion->close();
     exit;
 }
+
 
 // Creación de fila de la tabla promedio semanas
 $sqlSeleccionSemanas= "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
@@ -192,6 +209,10 @@ if (isset($_POST['actualizarSemanas'])) {
     // Reiniciar diagramagastosestudiante a 0
     $sqlReiniciarGastosEstudiante = "UPDATE diagramagastosestudiante SET transporte=0, alimentacion=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario'";
     $conexion->query($sqlReiniciarGastosEstudiante);
+
+    // Reiniciar notificaciones
+    $sqlDeleteAllNotificaciones = "DELETE FROM notificaciones WHERE id_usuario='$idUsuario'";
+    $conexion->query($sqlDeleteAllNotificaciones);
     
     header("Location: {$_SERVER['PHP_SELF']}");
 }
@@ -217,6 +238,34 @@ if (isset($_POST['registrarAhorro'])) {
     $conexion->query($sqlUpdateAhorro);
     header("Location: {$_SERVER['PHP_SELF']}");
 }
+
+//notificaciones pendientes
+$diasNotificacion = 2;
+$fechaLimiteNotificacion = date('Y-m-d', strtotime("+$diasNotificacion days"));
+$sqlGetEventos = "SELECT * FROM pendiente WHERE idUsuario='$idUsuario'";
+$resultado = mysqli_query($conexion, $sqlGetEventos);
+
+if ($resultado) {
+    while ($row = $resultado->fetch_array()) {
+        $idPendiente = $row['id'];
+        $nombrePendiente = $row['nombre'];
+        $fechaPendiente = $row['fecha'];
+        if ($fechaPendiente <= $fechaLimiteNotificacion) {
+            $sqlExisteNotificacion = "SELECT * FROM notificaciones WHERE id_usuario='$idUsuario' AND tipo='$idPendiente'";
+            $resultadoExisteNotificacion = $conexion->query($sqlExisteNotificacion);
+
+            if ($resultadoExisteNotificacion->num_rows == 0) {
+                $mensajeNotificacion = mysqli_real_escape_string($conexion, "$nombrePendiente vencerá el $fechaPendiente.");
+                $tituloNotificacion = "Pendiente Próximo";
+                $fechaNotificacion = date('Y-m-d H:i:s');
+
+                $sqlInsertNotificacion = "INSERT INTO notificaciones (id_usuario, tipo, icono, color, titulo, mensaje, fecha) VALUES ('$idUsuario', '$idPendiente', 'clock', 'danger', '$tituloNotificacion', '$mensajeNotificacion', '$fechaNotificacion')";
+                $conexion->query($sqlInsertNotificacion);
+            }
+        }
+    }
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -268,7 +317,7 @@ if (isset($_POST['registrarAhorro'])) {
             <li class="nav-item dropdown">
                 <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                     <i class="bi bi-bell"></i>
-                    <span class="badge bg-primary badge-number" id="notificationCount">4</span>
+                    <span class="badge bg-primary badge-number" id="notificationCount"></span>
                 </a><!-- End Notification Icon -->
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications" aria-labelledby="navbarDropdown" id="notificationDropdown">
 
@@ -291,26 +340,26 @@ if (isset($_POST['registrarAhorro'])) {
                                 $('#notificationDropdown').empty();
 
                                 $('#notificationDropdown').append(`
-                    <li class="dropdown-header">
-                            Tienes ${response.length} notificaciones nuevas
-                            <a href="#" style="text-decoration: none;"><span class="badge rounded-pill bg-primary p-2 ms-2" style="opacity: 0; border: none;" disabled>Ver todo</span></a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                `);
+                                    <li class="dropdown-header">
+                                            Tienes ${response.length} notificaciones nuevas
+                                            <a href="#" style="text-decoration: none;"><span class="badge rounded-pill bg-primary p-2 ms-2" style="opacity: 0; border: none;" disabled>Ver todo</span></a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                `);
 
                                 // Agregar las nuevas notificaciones
                                 response.forEach(function(notification) {
                                     $('#notificationDropdown').append(`
-                        <li class="notification-item">
-                            <i class="bi bi-${notification.icon} text-${notification.color}"></i>
-                            <div>
-                                <h4>${notification.title}</h4>
-                                <p>${notification.message}</p>
-                                <p>${notification.time}</p>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                    `);
+                                        <li class="notification-item">
+                                            <i class="bi bi-${notification.icon} text-${notification.color}"></i>
+                                            <div>
+                                                <h4>${notification.title}</h4>
+                                                <p>${notification.message}</p>
+                                                <p>${notification.time}</p>
+                                            </div>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    `);
                                 });
                             },
                             error: function(xhr, status, error) {
@@ -344,7 +393,11 @@ if (isset($_POST['registrarAhorro'])) {
 
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
-                        <h6>Kevin Anderson</h6>
+                        <h6><?php
+                            if(isset($_SESSION['usuario'])) {
+                                echo $_SESSION['usuario'];
+                            }
+                            ?></h6>
                         <span>Web Designer</span>
                     </li>
                     <li>
@@ -475,7 +528,7 @@ if (isset($_POST['registrarAhorro'])) {
                       <h6>Actualizar</h6>
                     </li>
                     <li>
-                      <form action="estudiante.php" method="POST">
+                        <form action="estudiante.php" method="POST">
                       <input type="hidden" value="<?php echo (isset($sumaTotalG) ? $sumaTotalG : 0); ?>" name="presupuestoProm">
                       <input type="submit" class="dropdown-item" href="#" name="actualizarSemanas" value="Nueva semana" onclick="recargarPaginas()">
                     </form>
@@ -588,7 +641,7 @@ if (isset($_POST['registrarAhorro'])) {
                     $montoPendiente=$row['precio'];
                     $fechaPendiente=$row['fecha'];
                     $idPendiente = $row['id'];
-                 
+
                 ?>
                   <div class="activity-item d-flex" >
                       <div class="activite-label"><?php echo($fechaPendiente); ?><br><b> <p>$<?php echo($montoPendiente); ?></p></b></div>

@@ -62,13 +62,40 @@ if ($resultado->num_rows > 0) {
 $sqlUpdate = "UPDATE diagramagastosestudiante SET transporte ='$totalGastos' WHERE idUsuario = '$idUsuario'";
 $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
 
-// Obtener nombre de usario 
-function nombreUsuarios($conexion, $idUsuario) {
-  $sqlNombre="SELECT * FROM base_usuario WHERE ID='$idUsuario'";
-  $resultado = $conexion->query($sqlNombre);
-  $dato = $resultado->fetch_assoc();
-  $nombreUsario=$dato['nombre'];
-  echo $nombreUsario;
+//crear notificacion de exceso
+if ($totalGastos > $presupuesto) {
+    $sqlNotificacion = "SELECT * FROM notificaciones WHERE id_usuario='$idUsuario' AND tipo='Transporte'";
+    $resultadoNotificacion = $conexion->query($sqlNotificacion);
+
+    if ($resultadoNotificacion->num_rows == 0) {
+        $mensaje = "Has excedido tus gastos de transporte esta semana.";
+        $titulo = "Presupuesto superado";
+        $fecha = date('Y-m-d H:i:s'); // Obtener la fecha y hora actual
+        $sqlInsertNotificacion = "INSERT INTO notificaciones (id_usuario, tipo, icono, color, titulo, mensaje, fecha) VALUES ('$idUsuario', 'Transporte', 'exclamation-circle', 'warning', '$titulo', '$mensaje', '$fecha')";
+        if ($conexion->query($sqlInsertNotificacion) === TRUE) {
+            echo "Notificación insertada correctamente.";
+            error_log("Notificación insertada correctamente: " . $sqlInsertNotificacion);
+        } else {
+            echo "Error al insertar la notificación: " . $conexion->error;
+            error_log("Error al insertar la notificación: " . $conexion->error);
+        }
+    }
+}
+if ($totalGastos <= $presupuesto) {
+// Si los gastos son menores o iguales al presupuesto, eliminar cualquier notificación existente
+    $sqlNotificacion = "SELECT * FROM notificaciones WHERE id_usuario='$idUsuario' AND tipo='Transporte'";
+    $resultadoNotificacion = $conexion->query($sqlNotificacion);
+
+    if ($resultadoNotificacion->num_rows > 0) {
+        $sqlDeleteNotificacion = "DELETE FROM notificaciones WHERE id_usuario='$idUsuario' AND tipo='Transporte'";
+        if ($conexion->query($sqlDeleteNotificacion) === TRUE) {
+            echo "Notificación eliminada correctamente.";
+            error_log("Notificación eliminada correctamente: " . $sqlDeleteNotificacion);
+        } else {
+            echo "Error al eliminar la notificación: " . $conexion->error;
+            error_log("Error al eliminar la notificación: " . $conexion->error);
+        }
+    }
 }
 
 
@@ -129,73 +156,87 @@ function nombreUsuarios($conexion, $idUsuario) {
             <li class="nav-item dropdown">
                 <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                     <i class="bi bi-bell"></i>
-                    <span class="badge bg-primary badge-number">4</span>
+                    <span class="badge bg-primary badge-number" id="notificationCount"></span>
                 </a><!-- End Notification Icon -->
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-                    <li class="dropdown-header">
-                        You have 4 new notifications
-                        <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="notification-item">
-                        <i class="bi bi-exclamation-circle text-warning"></i>
-                        <div>
-                            <h4>Lorem Ipsum</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>30 min. ago</p>
-                        </div>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="notification-item">
-                        <i class="bi bi-x-circle text-danger"></i>
-                        <div>
-                            <h4>Atque rerum nesciunt</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>1 hr. ago</p>
-                        </div>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="notification-item">
-                        <i class="bi bi-check-circle text-success"></i>
-                        <div>
-                            <h4>Sit rerum fuga</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>2 hrs. ago</p>
-                        </div>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="notification-item">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        <div>
-                            <h4>Dicta reprehenderit</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>4 hrs. ago</p>
-                        </div>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications" aria-labelledby="navbarDropdown" id="notificationDropdown">
+
                 </ul><!-- End Notification Dropdown Items -->
             </li><!-- End Notification Nav -->
+
+            <script>
+                $(document).ready(function() {
+                    // Función para cargar las notificaciones
+                    function loadNotifications() {
+                        $.ajax({
+                            url: '../notificaciones.php',
+                            type: 'GET',
+                            dataType: 'json', // Especificamos que esperamos JSON como respuesta
+                            success: function(response) {
+                                // Actualizar el contador de notificaciones
+                                $('#notificationCount').text(response.length);
+
+                                // Vaciar el contenedor de notificaciones
+                                $('#notificationDropdown').empty();
+
+                                $('#notificationDropdown').append(`
+                                    <li class="dropdown-header">
+                                            Tienes ${response.length} notificaciones nuevas
+                                            <a href="#" style="text-decoration: none;"><span class="badge rounded-pill bg-primary p-2 ms-2" style="opacity: 0; border: none;" disabled>Ver todo</span></a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                `);
+
+                                // Agregar las nuevas notificaciones
+                                response.forEach(function(notification) {
+                                    $('#notificationDropdown').append(`
+                                        <li class="notification-item">
+                                            <i class="bi bi-${notification.icon} text-${notification.color}"></i>
+                                            <div>
+                                                <h4>${notification.title}</h4>
+                                                <p>${notification.message}</p>
+                                                <p>${notification.time}</p>
+                                            </div>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    `);
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error al cargar las notificaciones:', error);
+                            }
+                        });
+                    }
+
+                    // Cargar las notificaciones al cargar la página
+                    loadNotifications();
+
+                    // Actualizar las notificaciones cada cierto tiempo (por ejemplo, cada 5 segundos)
+                    setInterval(function() {
+                        loadNotifications();
+                    }, 5000);
+                });
+            </script>
 
 
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    <span class="d-none d-md-block dropdown-toggle ps-2"><?php nombreUsuarios($conexion,$idUsuario)?></span>
-                </a><!-- End Profile Iamge Icon -->
+
+                    <span class="d-none d-md-block dropdown-toggle ps-2"><?php
+                        if(isset($_SESSION['usuario'])) {
+                            echo $_SESSION['usuario'];
+                        }
+                        ?>
+                    </span>
+                </a>
 
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
-                        <h6><?php nombreUsuarios($conexion,$idUsuario)?></h6>
+                        <h6><?php
+                            if(isset($_SESSION['usuario'])) {
+                                echo $_SESSION['usuario'];
+                            }
+                            ?></h6>
                         <span>Web Designer</span>
                     </li>
                     
