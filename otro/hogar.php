@@ -102,8 +102,6 @@ function datos($conexion, $idUsuario) {
     return $resultado->fetch_assoc();
 }
 
-
-
 // Actualizar semanas
 if (isset($_POST['actualizarSemanas'])) {
     // Obtener los gastos de la semana

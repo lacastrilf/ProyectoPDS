@@ -107,7 +107,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
 <!-- ======= Header ======= -->
 <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="d-flex align-items-center justify-content-between">
-        <a href="../inicio/index.php" class="logo d-flex align-items-center">
+        <a href="../../inicio/index.php" class="logo d-flex align-items-center">
             <span class="d-none d-lg-block">INICIO</span>
         </a>
         <i class="bi bi-list toggle-sidebar-btn"></i>
