@@ -110,9 +110,14 @@ if (isset($_POST['actualizarSemanas'])) {
     $ocioGS = $gastosSemanas['ocio'];
     $colchonGS = $gastosSemanas['colchon'];
     $alimentacionGS = $gastosSemanas['alimentacion'];
+<<<<<<< Updated upstream
     $datosSemanales = 0;
     $viviendaGS= $datosSemanales['vivienda'];
     $estudianteGS= $datosSemanales['estudiante'];
+=======
+    $viviendaGS=$datosSemanas['vivienda'];
+    $estudianteGS=$datosSemanas['estudiante'];
+>>>>>>> Stashed changes
 
     // Seleccionar las semanas
     $sqlSeleccionSemanas = "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";

@@ -276,7 +276,7 @@ if ($resultado) {
   $aleatorio2 = rand(1, 9);
   $aleatorio3 = rand(1, 9);
   $codigo=$idUsuario*1000+$aleatorio1*100+$aleatorio2*10+$aleatorio3*1; 
-  
+  $_SESSION['codigo'] = $codigo;
   $sqlSeleccionCodigo= "SELECT * FROM codigos WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccionCodigo);
 if ($resultado->num_rows == 0) {
@@ -429,32 +429,11 @@ if($datoAhorro){
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                            <i class="bi bi-person"></i>
-                            <span>My Profile</span>
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                
 
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                            <i class="bi bi-gear"></i>
-                            <span>Account Settings</span>
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                
 
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                            <i class="bi bi-question-circle"></i>
-                            <span>Need Help?</span>
-                        </a>
-                    </li>
+                   
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -657,7 +636,7 @@ if($datoAhorro){
               <h5 class="card-title">Pendientes</h5>
               <div class="activity">
 
-                
+                <div style="height:384px;">
                 <?php
                 $sqlGetEventos = "SELECT * FROM pendiente WHERE idUsuario='$idUsuario'";
                 $resultado=mysqli_query($conexion, $sqlGetEventos);
@@ -740,7 +719,7 @@ if($datoAhorro){
                           </div>
                       </div>
                   </div>
-         
+                  </div>
               </div>
               </div>
             </div>
@@ -749,9 +728,8 @@ if($datoAhorro){
 
           <div class="col-lg-4">
           <div class="card">
-         
             <div class="card-body pb-0">
-              
+
               <h5 class="card-title">Gasto-Presupuesto <span> | Semanal</span></h5>
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
 
