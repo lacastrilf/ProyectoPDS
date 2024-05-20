@@ -48,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["presupuesto"])) {
         } else {
             echo "Error al guardar el gasto: " . $conexion->error;
         }
+        
     }
 
 //Generar total de gastos
@@ -364,18 +365,12 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
         </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Hogar/servicios.php">
-                <i class="bi bi-receipt"></i>
-                <span>Servicios</span>
-            </a>
-        </li><!-- End F.A.Q Page Nav -->
+      <a class="nav-link collapsed" href="../Hogar/vivienda.php">
+          <i class="bi bi-house"></i>
+          <span>Vivienda</span>
+        </a>
+      </li><!-- End F.A.Q Page Nav -->
 
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="../Hogar/vivienda.php">
-                <i class="bi bi-house"></i>
-                <span>Vivienda</span>
-            </a>
-        </li>
 
 
         <li class="nav-item">
@@ -613,7 +608,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                                 $descripcion=$row['descripcion'];
                                 $monto=$row['gasto'];
                                 $fecha=$row['fecha'];
-
+                                
                                 ?>
                                 <div class="activity-item d-flex" >
                                     <div class="activite-label"><?php echo($fecha); ?><br><b> <p>$<?php echo($monto); ?></p></b></div>

@@ -111,8 +111,10 @@ $resultado = $conexion->query($sqlSeleccionAhorro);
 if ($resultado->num_rows == 0) {
     $sqlIngresarAhorro="INSERT INTO ahorro VALUES (NULL, '$idUsuario', 0, 0)";
     $conexion->query($sqlIngresarAhorro);
-} else {
-    $datoAhorro = $resultado->fetch_assoc();
+} 
+$resultado = $conexion->query($sqlSeleccionAhorro);
+$datoAhorro = $resultado->fetch_assoc();
+if($datoAhorro){
     $ahorroTotal = $datoAhorro['Ahorro'];
     $meta = $datoAhorro['ahorroEstablecido'];
 }
@@ -239,6 +241,7 @@ if (isset($_POST['registrarAhorro'])) {
     header("Location: {$_SERVER['PHP_SELF']}");
 }
 
+
 //notificaciones pendientes
 $diasNotificacion = 2;
 $fechaLimiteNotificacion = date('Y-m-d', strtotime("+$diasNotificacion days"));
@@ -264,6 +267,27 @@ if ($resultado) {
             }
         }
     }
+}
+
+
+
+//Crear codigo 
+  $aleatorio1 = rand(1, 9);
+  $aleatorio2 = rand(1, 9);
+  $aleatorio3 = rand(1, 9);
+  $codigo=$idUsuario*1000+$aleatorio1*100+$aleatorio2*10+$aleatorio3*1; 
+  
+  $sqlSeleccionCodigo= "SELECT * FROM codigos WHERE idUsuario = '$idUsuario'";
+$resultado = $conexion->query($sqlSeleccionCodigo);
+if ($resultado->num_rows == 0) {
+  $sqlCodigo="INSERT INTO codigos VALUES (NULL, '$idUsuario', '$codigo', 'Desbloqueado') ";
+  $ejecutar4 = mysqli_query($conexion, $sqlCodigo);
+} 
+$resultado = $conexion->query($sqlSeleccionCodigo);
+$datoAhorro = $resultado->fetch_assoc();
+if($datoAhorro){
+  $sqlUpdateCodigo = "UPDATE codigos SET codigo='$codigo' WHERE idUsuario='$idUsuario'";
+  $ejecutar4 = mysqli_query($conexion, $sqlUpdateCodigo);
 }
 
 
@@ -394,11 +418,13 @@ if ($resultado) {
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
                         <h6><?php
+
                             if(isset($_SESSION['usuario'])) {
                                 echo $_SESSION['usuario'];
                             }
                             ?></h6>
-                        <span>Web Designer</span>
+                        <span><?php echo($codigo); ?></span>
+
                     </li>
                     <li>
                         <hr class="dropdown-divider">
@@ -840,8 +866,7 @@ if ($resultado) {
                      }
                   }
                   ?>
-                      <div id="reportsChart">
-                      </div>
+                      <div id="reportsChart"></div>
                   <script>
                     document.addEventListener("DOMContentLoaded", () => {
                       new ApexCharts(document.querySelector("#reportsChart"), {

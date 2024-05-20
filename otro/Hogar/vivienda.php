@@ -62,6 +62,35 @@ if ($resultado->num_rows > 0) {
 //Cambiar total de gastos en la base de datos
 $sqlUpdate="UPDATE diagramagastoshogar SET vivienda='$totalGastos' WHERE idUsuario='$idUsuario'";
 $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
+
+if(isset($_POST['agregarEvento'])){
+  $nombreEvento=$_POST['nombreEvento'];
+  $presupuestoEvento=$_POST['montoEvento'];
+  $fecha=$_POST['fechaEvento'];
+  $sqlInsertEvento = "INSERT INTO vivienda VALUES ('null','$idUsuario','$nombreEvento','$presupuestoEvento','$fecha')";
+  $ejecutar3 = mysqli_query($conexion, $sqlInsertEvento);
+  header("Location: {$_SERVER['PHP_SELF']}");
+}
+
+// Manejo de solicitud AJAX para cambiar pendientes de viviendaa
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['accion']) && $_POST['accion'] == 'eliminar') {
+  $idPendiente = $_POST['idPendiente'];
+
+  // Eliminar el pendiente
+  $sqlDeletePendiente = "DELETE FROM pendiente WHERE id = ?";
+  $stmt = $conexion->prepare($sqlDeletePendiente);
+  $stmt->bind_param("i", $idPendiente);
+
+  if ($stmt->execute()) {
+      echo 'success';
+  } else {
+      echo 'error';
+  }
+
+  $stmt->close();
+  $conexion->close();
+  exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -363,19 +392,11 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
         </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Hogar/servicios.php">
-                <i class="bi bi-receipt"></i>
-                <span>Servicios</span>
-            </a>
-        </li><!-- End F.A.Q Page Nav -->
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="../Hogar/vivienda.php">
-                <i class="bi bi-house"></i>
-                <span>Vivienda</span>
-            </a>
-        </li>
-
+      <a class="nav-link collapsed" href="../Hogar/vivienda.php">
+          <i class="bi bi-house"></i>
+          <span>Vivienda</span>
+        </a>
+      </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
             <a class="nav-link collapsed" href="../Hogar/ocio.php">
@@ -508,235 +529,123 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
               </div>
             </div><!-- End Revenue Card -->
 
-            <!-- Reports -->
-            <div class="col-12">
+             <!--Modal Añadir Eventos-->
+             <div class="modal fade" id="modalAñadirEvento" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Nuevo Gasto</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+
+                                  <form action="vivienda.php" method="POST">
+                      
+                                      <div class="mb-3">
+                                          <label for="gasto">Evento:</label>
+                                          <input type="text" class="form-control" id="gasto" name="nombreEvento" required>
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="descripcion">Monto:</label>
+                                          <input type="number" class="form-control" id="descripcion" name="montoEvento" placeholder="Descripción">
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="descripcion">Fecha:</label>
+                                          <input type="date" class="form-control" id="descripcion" name="fechaEvento" placeholder="Descripción">
+                                      </div>
+                                      <button type="submit" class="btn btn-success" name="agregarEvento">Guardar</button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+              </div>
+              <!-- End Model Añadir Evento -->
+
+              <script>
+                      function eliminarPendiente(idPendiente) {
+                          if (confirm('¿Estás seguro de que deseas eliminar este pendiente?')) {
+                              var button = document.querySelector('button[onclick="eliminarPendiente(' + idPendiente + ')"]');
+                              button.disabled = true; // Deshabilitar el botón mientras se procesa la solicitud
+
+                              $.ajax({
+                                  url: 'estudiante.php',
+                                  method: 'POST',
+                                  data: { accion: 'eliminar', idPendiente: idPendiente },
+                                  success: function(response) {
+                                      if (response === 'success') {
+                                          alert('Pendiente eliminado correctamente');
+                                          button.closest('.activity-item').remove(); // Eliminar el elemento del DOM sin recargar la página
+                                      } else {
+                                          alert('Error al eliminar el pendiente');
+                                          button.disabled = false; // Rehabilitar el botón si hay un error
+                                      }
+                                  },
+                                  error: function(xhr, status, error) {
+                                      alert('Error al eliminar el pendiente');
+                                      console.error(xhr.responseText);
+                                      button.disabled = false; // Rehabilitar el botón si hay un error
+                                  }
+                              });
+                          }
+                      }
+                  </script>
+
+           <!-- Reports -->
+           <div class="col-12">
               <div class="card">
 
                 <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
+                <a class="icon" href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirEvento"><i class="bi bi-plus-circle"></i></a>
                 </div>
+             
 
                 <div class="card-body">
-                  <h5 class="card-title">Reports <span>/Today</span></h5>
+                  <h5 class="card-title">vivienda<span>/Semanales</span></h5>
 
-                  <!-- Line Chart -->
-                  <div id="reportsChart"></div>
+                  <table class="table table-borderless">
+                    <thead>
+                      <tr>
+                      <th scope="col">Servicio</th>
+                        <th scope="col">Presupuesto</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $conexion = new mysqli("localhost", "root", "", "base_proyecto");
+                    $sqlGetEventos = "SELECT * FROM vivienda WHERE idUsuario='$idUsuario'";
+                    $resultado=mysqli_query($conexion, $sqlGetEventos);
+                    if($resultado){
+                      while($row = $resultado->fetch_array()){
+                        $nombreEvento=$row['nombrevivienda'];
+                        $montoEvento=$row['precio'];
+                        $fecha=$row['fecha'];
+                     
+                    ?>
+                      <tr>
+                        <td><?php echo($nombreEvento)?></td>
+                        <td>$<?php echo($montoEvento)?></td>
+                        <td class="fw-bold"><?php echo($fecha)?></td>
+                        <td><button  type="button" class="btn btn-custom-orange btn-sm"  >Pendiente  </button></td>
+                   </tr>
+                    <?php
+                       }
+                    }
 
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      new ApexCharts(document.querySelector("#reportsChart"), {
-                        series: [{
-                          name: 'Sales',
-                          data: [31, 40, 28, 51, 42, 82, 56],
-                        }, {
-                          name: 'Revenue',
-                          data: [11, 32, 45, 32, 34, 52, 41]
-                        }, {
-                          name: 'Customers',
-                          data: [15, 11, 32, 18, 9, 24, 11]
-                        }],
-                        chart: {
-                          height: 350,
-                          type: 'area',
-                          toolbar: {
-                            show: false
-                          },
-                        },
-                        markers: {
-                          size: 4
-                        },
-                        colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                        fill: {
-                          type: "gradient",
-                          gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.3,
-                            opacityTo: 0.4,
-                            stops: [0, 90, 100]
-                          }
-                        },
-                        dataLabels: {
-                          enabled: false
-                        },
-                        stroke: {
-                          curve: 'smooth',
-                          width: 2
-                        },
-                        xaxis: {
-                          type: 'datetime',
-                          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-                        },
-                        tooltip: {
-                          x: {
-                            format: 'dd/MM/yy HH:mm'
-                          },
-                        }
-                      }).render();
-                    });
-                  </script>
-                  <!-- End Line Chart -->
+                    ?>
+                  </tbody>
+                  </table>
 
                 </div>
 
               </div>
             </div><!-- End Reports -->
 
-            <!-- Recent Sales -->
-            <div class="col-12">
-              <div class="card recent-sales overflow-auto">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
+           
 
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Recent Sales <span>| Today</span></h5>
-
-                  <table class="table table-borderless datatable">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row"><a href="#">#2457</a></th>
-                        <td>Brandon Jacob</td>
-                        <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                        <td>$64</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2147</a></th>
-                        <td>Bridie Kessler</td>
-                        <td><a href="#" class="text-primary">Blanditiis dolor omnis similique</a></td>
-                        <td>$47</td>
-                        <td><span class="badge bg-warning">Pending</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2049</a></th>
-                        <td>Ashleigh Langosh</td>
-                        <td><a href="#" class="text-primary">At recusandae consectetur</a></td>
-                        <td>$147</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Angus Grady</td>
-                        <td><a href="#" class="text-primar">Ut voluptatem id earum et</a></td>
-                        <td>$67</td>
-                        <td><span class="badge bg-danger">Rejected</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Raheem Lehner</td>
-                        <td><a href="#" class="text-primary">Sunt similique distinctio</a></td>
-                        <td>$165</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                </div>
-
-              </div>
-            </div><!-- End Recent Sales -->
-
-            <!-- Top Selling -->
-            <div class="col-12">
-              <div class="card top-selling overflow-auto">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body pb-0">
-                  <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
-                  <table class="table table-borderless">
-                    <thead>
-                      <tr>
-                        <th scope="col">Preview</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Sold</th>
-                        <th scope="col">Revenue</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-1.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
-                        <td>$64</td>
-                        <td class="fw-bold">124</td>
-                        <td>$5,828</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-2.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
-                        <td>$46</td>
-                        <td class="fw-bold">98</td>
-                        <td>$4,508</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-3.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
-                        <td>$59</td>
-                        <td class="fw-bold">74</td>
-                        <td>$4,366</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-4.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
-                        <td>$32</td>
-                        <td class="fw-bold">63</td>
-                        <td>$2,016</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="../assets/img/product-5.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
-                        <td>$79</td>
-                        <td class="fw-bold">41</td>
-                        <td>$3,239</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                </div>
-
-              </div>
-            </div><!-- End Top Selling -->
+           
 
           </div>
         </div><!-- End Left side columns -->
@@ -750,6 +659,7 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                     <h5 class="card-title">Actividad reciente<span>| Esta Semana</span></h5>
 
                     <div class="activity">
+                      <div style="height: 390px;">
                         <?php
                         $sqlGetEventos = "SELECT * FROM gastosi WHERE id_usuario='$idUsuario' AND tipo='Vivienda'";
                         $resultado=mysqli_query($conexion, $sqlGetEventos);
@@ -771,164 +681,15 @@ $ejecutar3 = mysqli_query($conexion, $sqlUpdate);
                         }
 
                         ?>
-
+</div>
                     </div>
 
                 </div>
             </div><!-- End Recent Activity -->
 
-          <!-- Budget Report -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
+         
 
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-
-            <div class="card-body pb-0">
-              <h5 class="card-title">Budget Report <span>| This Month</span></h5>
-
-              <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
-
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
-                    legend: {
-                      data: ['Allocated Budget', 'Actual Spending']
-                    },
-                    radar: {
-                      // shape: 'circle',
-                      indicator: [{
-                          name: 'Sales',
-                          max: 6500
-                        },
-                        {
-                          name: 'Administration',
-                          max: 16000
-                        },
-                        {
-                          name: 'Information Technology',
-                          max: 30000
-                        },
-                        {
-                          name: 'Customer Support',
-                          max: 38000
-                        },
-                        {
-                          name: 'Development',
-                          max: 52000
-                        },
-                        {
-                          name: 'Marketing',
-                          max: 25000
-                        }
-                      ]
-                    },
-                    series: [{
-                      name: 'Budget vs spending',
-                      type: 'radar',
-                      data: [{
-                          value: [4200, 3000, 20000, 35000, 50000, 18000],
-                          name: 'Allocated Budget'
-                        },
-                        {
-                          value: [5000, 14000, 28000, 26000, 42000, 21000],
-                          name: 'Actual Spending'
-                        }
-                      ]
-                    }]
-                  });
-                });
-              </script>
-
-            </div>
-          </div><!-- End Budget Report -->
-
-          <!-- Website Traffic -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-
-            <div class="card-body pb-0">
-              <h5 class="card-title">Website Traffic <span>| Today</span></h5>
-
-              <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
-
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  echarts.init(document.querySelector("#trafficChart")).setOption({
-                    tooltip: {
-                      trigger: 'item'
-                    },
-                    legend: {
-                      top: '5%',
-                      left: 'center'
-                    },
-                    series: [{
-                      name: 'Access From',
-                      type: 'pie',
-                      radius: ['40%', '70%'],
-                      avoidLabelOverlap: false,
-                      label: {
-                        show: false,
-                        position: 'center'
-                      },
-                      emphasis: {
-                        label: {
-                          show: true,
-                          fontSize: '18',
-                          fontWeight: 'bold'
-                        }
-                      },
-                      labelLine: {
-                        show: false
-                      },
-                      data: [{
-                          value: 1048,
-                          name: 'Search Engine'
-                        },
-                        {
-                          value: 735,
-                          name: 'Direct'
-                        },
-                        {
-                          value: 580,
-                          name: 'Email'
-                        },
-                        {
-                          value: 484,
-                          name: 'Union Ads'
-                        },
-                        {
-                          value: 300,
-                          name: 'Video Ads'
-                        }
-                      ]
-                    }]
-                  });
-                });
-              </script>
-
-            </div>
-          </div><!-- End Website Traffic -->
-
+          
 
           </div><!-- End News & Updates -->
 

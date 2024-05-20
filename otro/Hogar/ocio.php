@@ -60,6 +60,10 @@ if ($resultado->num_rows > 0) {
     $totalGastos = $dato['total_gastos'];
 }
 
+//Cambiar total de gastos en la base de datos
+$sqlUpdate="UPDATE diagramagastoshogar SET ocio='$totalGastos' WHERE idUsuario='$idUsuario'";
+$ejecutar3 = mysqli_query($conexion, $sqlUpdate);
+
 if(isset($_POST['agregarEvento'])){
     $nombreEvento=$_POST['nombreEvento'];
     $presupuestoEvento=$_POST['montoEvento'];
@@ -370,18 +374,13 @@ if(isset($_POST['agregarEvento'])){
         </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="../Hogar/servicios.php">
-                <i class="bi bi-receipt"></i>
-                <span>Servicios</span>
-            </a>
-        </li><!-- End F.A.Q Page Nav -->
+      <a class="nav-link collapsed" href="../Hogar/vivienda.php">
+          <i class="bi bi-house"></i>
+          <span>Vivienda</span>
+        </a>
+      </li><!-- End F.A.Q Page Nav -->
 
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="../Hogar/vivienda.php">
-                <i class="bi bi-house"></i>
-                <span>Vivienda</span>
-            </a>
-        </li>
+
 
 
         <li class="nav-item">

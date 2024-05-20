@@ -8,23 +8,22 @@ $idUsuario = $_SESSION['id_usuario'];
 $conexion = new mysqli("localhost", "root", "", "base_proyecto");
 
 // Obtener la suma de todos los presupuestos
-$sqlSuma = "SELECT SUM(alimentacion + colchon + ocio + servicios + transporte + vivienda) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
+$sqlSuma = "SELECT SUM(alimentacion + colchon + ocio+ transporte + vivienda ) AS suma_total FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultadoSuma = $conexion->query($sqlSuma);
 $sumaTotal = $resultadoSuma->fetch_assoc()['suma_total'] ?? 0;
 
 //obtener cada presupuesto para la grafica
-$sqlCategorias = "SELECT alimentacion AS alimentacion, transporte AS transporte, ocio AS ocio, servicios AS servicios, vivienda AS vivienda FROM presupuestos WHERE id_usuario='$idUsuario'";
+$sqlCategorias = "SELECT alimentacion AS alimentacion, transporte AS transporte, ocio AS ocio, vivienda AS vivienda FROM presupuestos WHERE id_usuario='$idUsuario'";
 $resultadoCategorias = $conexion->query($sqlCategorias);
-$categorias = $resultadoCategorias->fetch_assoc() ?? ['alimentacion' => 0, 'transporte' => 0, 'ocio' => 0, 'servicios' => 0, 'vivienda' => 0];
+$categorias = $resultadoCategorias->fetch_assoc() ?? ['alimentacion' => 0, 'transporte' => 0, 'ocio' => 0, 'estudiante' => 0, 'vivienda' => 0];
 $gAlimentacion = $categorias['alimentacion'];
 $gTransporte = $categorias['transporte'];
 $gOcio = $categorias['ocio'];
-$gServicios = $categorias['servicios'];
 $gVivienda = $categorias['vivienda'];
 
 
 //Obtener la suma total de los gastos
-$sqlSumaG = "SELECT SUM(alimentacion + transporte + servicios + vivienda + ocio ) AS suma_total FROM diagramagastoshogar WHERE idUsuario='$idUsuario'";
+$sqlSumaG = "SELECT SUM(alimentacion + transporte + vivienda + ocio+colchon) AS suma_total FROM diagramagastoshogar WHERE idUsuario='$idUsuario'";
 $resultadoSumaG= $conexion->query($sqlSumaG);
 $sumaTotalG = $resultadoSumaG->fetch_assoc()['suma_total'];
 
@@ -40,7 +39,6 @@ $dato = $resultado->fetch_assoc();
 if($dato){
   $alimentacionGrafico=$dato['alimentacion'];
   $transporteGrafico=$dato['transporte'];
-  $serviciosGrafico=$dato['servicios'];
   $viviendaGrafico=$dato['vivienda'];
   $ocioGrafico=$dato['ocio'];
 }
@@ -85,11 +83,11 @@ if ($resultado->num_rows == 0) {
 }
 
 // Creación de fila de la tabla Grafica ahorro
-$sqlSeleccionGrafica= "SELECT * FROM semanasgastos WHERE idUsuario = '$idUsuario'";
+$sqlSeleccionGrafica= "SELECT * FROM semanasgastosh WHERE idUsuario = '$idUsuario'";
 $resultado = $conexion->query($sqlSeleccionGrafica);
 if ($resultado->num_rows == 0) {
     for ($i = 1; $i <= 4; $i++) {
-        $sqlIngresarGrafica="INSERT INTO semanasgastos VALUES (NULL, '$idUsuario', '$i', 0, 0, 0, 0)";
+        $sqlIngresarGrafica="INSERT INTO semanasgastosh VALUES (NULL, '$idUsuario', '$i', 0, 0, 0,0,0,0)";
         $conexion->query($sqlIngresarGrafica);
     }
 }
@@ -100,6 +98,8 @@ function datos($conexion, $idUsuario) {
     return $resultado->fetch_assoc();
 }
 
+
+
 // Actualizar semanas
 if (isset($_POST['actualizarSemanas'])) {
     // Obtener los gastos de la semana
@@ -108,6 +108,8 @@ if (isset($_POST['actualizarSemanas'])) {
     $ocioGS = $gastosSemanas['ocio'];
     $colchonGS = $gastosSemanas['colchon'];
     $alimentacionGS = $gastosSemanas['alimentacion'];
+    $viviendaGS=$datosSemanales['vivienda'];
+    $estudianteGS=$datosSemanales['estudiante'];
 
     // Seleccionar las semanas
     $sqlSeleccionSemanas = "SELECT * FROM semanas WHERE idUsuario = '$idUsuario'";
@@ -118,29 +120,29 @@ if (isset($_POST['actualizarSemanas'])) {
 
         $sqlUpdateSemanas = "UPDATE semanas SET semana1='$sumaTotalG' WHERE idUsuario='$idUsuario'";
         $conexion->query($sqlUpdateSemanas);
-        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastosh SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS', vivienda='$viviendaGS', estudiante='$estudianteGS' WHERE idUsuario='$idUsuario' AND semana='1'";
         $conexion->query($sqlUpdatePresupuestosGS);
     } elseif ($dato['semana2'] == 0) {
         $sqlUpdateSemanas = "UPDATE semanas SET semana2='$sumaTotalG' WHERE idUsuario='$idUsuario'";
         $conexion->query($sqlUpdateSemanas);
-        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='2'";
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastosh SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS', vivienda='$viviendaGS', estudiante='$estudianteGS' WHERE idUsuario='$idUsuario' AND semana='2'";
         $conexion->query($sqlUpdatePresupuestosGS);
     } elseif ($dato['semana3'] == 0) {
         $sqlUpdateSemanas = "UPDATE semanas SET semana3='$sumaTotalG' WHERE idUsuario='$idUsuario'";
         $conexion->query($sqlUpdateSemanas);
-        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='3'";
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastosh SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS', vivienda='$viviendaGS', estudiante='$estudianteGS' WHERE idUsuario='$idUsuario' AND semana='3'";
         $conexion->query($sqlUpdatePresupuestosGS);
     } elseif ($dato['semana4'] == 0) {
         $sqlUpdateSemanas = "UPDATE semanas SET semana4='$sumaTotalG' WHERE idUsuario='$idUsuario'";
         $conexion->query($sqlUpdateSemanas);
-        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='4'";
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastosh SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS', vivienda='$viviendaGS', estudiante='$estudianteGS' WHERE idUsuario='$idUsuario' AND semana='4'";
         $conexion->query($sqlUpdatePresupuestosGS);
     } else {
         $sqlUpdateSemanas = "UPDATE semanas SET semana1='$sumaTotalG', semana2=0, semana3=0, semana4=0 WHERE idUsuario='$idUsuario'";
         $conexion->query($sqlUpdateSemanas);
-        $sqlUpdatePresupuestosGS = "UPDATE semanasgastos SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
+        $sqlUpdatePresupuestosGS = "UPDATE semanasgastosh SET alimentacion='$alimentacionGS', transporte='$transporteGS', ocio='$ocioGS', colchon='$colchonGS' WHERE idUsuario='$idUsuario' AND semana='1'";
         $conexion->query($sqlUpdatePresupuestosGS);
-        $sqlReiniciarSemanasGastos = "UPDATE semanasgastos SET alimentacion=0, transporte=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario' AND semana IN ('2', '3', '4')";
+        $sqlReiniciarSemanasGastos = "UPDATE semanasgastosh SET alimentacion=0, transporte=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario' AND semana IN ('2', '3', '4')";
         $conexion->query($sqlReiniciarSemanasGastos);
     }
 
@@ -165,7 +167,7 @@ if (isset($_POST['actualizarSemanas'])) {
     $conexion->query($sqlEliminarPresupuestos);
 
     // Reiniciar diagramagastosHOGAR a 0
-    $sqlReiniciarGastosHogar = "UPDATE diagramagastoshogar SET transporte=0, alimentacion=0, ocio=0, colchon=0 WHERE idUsuario='$idUsuario'";
+    $sqlReiniciarGastosHogar = "UPDATE diagramagastoshogar SET transporte=0, alimentacion=0, ocio=0, colchon=0, vivienda=0, estudiante=0 WHERE idUsuario='$idUsuario'";
     $conexion->query($sqlReiniciarGastosHogar);
 
     header("Location: {$_SERVER['PHP_SELF']}");
@@ -328,56 +330,14 @@ if (isset($_POST['registrarAhorro'])) {
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
+            <span class="d-none d-md-block dropdown-toggle ps-2"><?php
+                        if(isset($_SESSION['usuario'])) {
+                            echo $_SESSION['usuario'];
+                        }
+                        ?></span>
           </a><!-- End Profile Iamge Icon -->
 
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>Need Help?</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Sign Out</span>
-              </a>
-            </li>
-
-          </ul><!-- End Profile Dropdown Items -->
+         
         </li><!-- End Profile Nav -->
 
       </ul>
@@ -415,18 +375,12 @@ if (isset($_POST['registrarAhorro'])) {
         </li><!-- End Profile Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="../otro/Hogar/servicios.php">
-          <i class="bi bi-receipt"></i>
-          <span>Servicios</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="../otro/Hogar/vivienda.php">
+      <a class="nav-link collapsed" href="../otro/Hogar/vivienda.php">
           <i class="bi bi-house"></i>
           <span>Vivienda</span>
         </a>
-      </li>
+      </li><!-- End F.A.Q Page Nav -->
+
 
 
         <li class="nav-item">
@@ -677,7 +631,7 @@ if (isset($_POST['registrarAhorro'])) {
               <div class="col-lg-4">
                   <div class="card">
                       <div class="card-body pb-0">
-                          <h5 class="card-title">Gasto y presupuesto <span> | Semanal</span></h5>
+                          <h5 class="card-title">Gasto-Presupuesto <span> | Semanal</span></h5>
                           <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
                           <script>
                               document.addEventListener("DOMContentLoaded", () => {
@@ -690,7 +644,6 @@ if (isset($_POST['registrarAhorro'])) {
                                               { name: 'Transporte', max: <?php echo $sumaTotal; ?>},
                                               { name: 'Alimentación', max: <?php echo $sumaTotal; ?> },
                                               { name: 'Vivienda', max: <?php echo $sumaTotal; ?> },
-                                              { name: 'Servicios', max: <?php echo $sumaTotal; ?> },
                                               { name: 'Ocio', max: <?php echo $sumaTotal; ?> },
                                           ]
                                       },
@@ -698,14 +651,14 @@ if (isset($_POST['registrarAhorro'])) {
                                           name: 'Presupuesto vs Gastos',
                                           type: 'radar',
                                           data: [{
-                                              value: [<?php echo $transporteGrafico; ?>, <?php echo $alimentacionGrafico; ?>, <?php echo $viviendaGrafico; ?>, <?php echo $serviciosGrafico; ?>, <?php echo $ocioGrafico; ?>],
+                                              value: [<?php echo $transporteGrafico; ?>, <?php echo $alimentacionGrafico; ?>, <?php echo $viviendaGrafico; ?>, <?php echo $ocioGrafico; ?>],
                                               name: 'Gastos',
                                               areaStyle: {
                                                   color: 'rgba(0, 128, 255, 0.5)'
                                               }
                                           },
                                               {
-                                                  value: [<?php echo $gTransporte; ?>,<?php echo $gAlimentacion; ?>, <?php echo $gVivienda; ?>, <?php echo $gServicios; ?>,<?php echo $gOcio; ?>],
+                                                  value: [<?php echo $gTransporte; ?>,<?php echo $gAlimentacion; ?>, <?php echo $gVivienda; ?>,<?php echo $gOcio; ?>],
                                                   name: 'Presupuesto',
                                                   areaStyle: {
                                                       color: 'rgba(64,255,0,0.5)'
@@ -767,10 +720,7 @@ if (isset($_POST['registrarAhorro'])) {
                                                   value:  <?php echo($alimentacionGrafico)  ?>,
                                                   name: 'Alimentación'
                                               },
-                                              {
-                                                  value:  <?php echo($serviciosGrafico)  ?>,
-                                                  name: 'Servicios'
-                                              },
+                                              
                                               {
                                                   value: <?php echo($viviendaGrafico)  ?>,
                                                   name: 'Vivienda'
@@ -810,63 +760,77 @@ if (isset($_POST['registrarAhorro'])) {
                       </div>
 
                       <div class="card-body">
-                          <h5 class="card-title">Reports <span>/Today</span></h5>
-
-                          <!-- Line Chart -->
+                          <h5 class="card-title">Gastos <span>/Ultimo mes</span></h5>
+                        <?php
+                        $sqlSeleccionarGrafica="SELECT * FROM semanasgastosh WHERE idUsuario='$idUsuario'";
+                        $resultado=mysqli_query($conexion, $sqlSeleccionarGrafica);
+                        $array_Grafica=array();
+                        if ($resultado){
+                            while($row = $resultado->fetch_array()){
+                            array_push($array_Grafica, $row);
+                            }
+                        }
+                        ?>
                           <div id="reportsChart"></div>
 
                           <script>
-                              document.addEventListener("DOMContentLoaded", () => {
-                                  new ApexCharts(document.querySelector("#reportsChart"), {
-                                      series: [{
-                                          name: 'Sales',
-                                          data: [31, 40, 28, 51, 42, 82, 56],
-                                      }, {
-                                          name: 'Revenue',
-                                          data: [11, 32, 45, 32, 34, 52, 41]
-                                      }, {
-                                          name: 'Customers',
-                                          data: [15, 11, 32, 18, 9, 24, 11]
-                                      }],
-                                      chart: {
-                                          height: 350,
-                                          type: 'area',
-                                          toolbar: {
-                                              show: false
-                                          },
-                                      },
-                                      markers: {
-                                          size: 4
-                                      },
-                                      colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                                      fill: {
-                                          type: "gradient",
-                                          gradient: {
-                                              shadeIntensity: 1,
-                                              opacityFrom: 0.3,
-                                              opacityTo: 0.4,
-                                              stops: [0, 90, 100]
-                                          }
-                                      },
-                                      dataLabels: {
-                                          enabled: false
-                                      },
-                                      stroke: {
-                                          curve: 'smooth',
-                                          width: 2
-                                      },
-                                      xaxis: {
-                                          type: 'datetime',
-                                          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-                                      },
-                                      tooltip: {
-                                          x: {
-                                              format: 'dd/MM/yy HH:mm'
-                                          },
-                                      }
-                                  }).render();
-                              });
-                          </script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                      new ApexCharts(document.querySelector("#reportsChart"), {
+                        series: [{
+                          name: 'Transporte',
+                          data: [<?php print_r($array_Grafica[0]['transporte']); ?>,<?php print_r($array_Grafica[1]['transporte']); ?>, <?php print_r($array_Grafica[2]['transporte']); ?>, <?php print_r($array_Grafica[3]['transporte']); ?>],
+                        }, {
+                          name: 'Alimentacion',
+                          data: [<?php print_r($array_Grafica[0]['alimentacion']); ?>,<?php print_r($array_Grafica[1]['alimentacion']); ?>, <?php print_r($array_Grafica[2]['alimentacion']); ?>, <?php print_r($array_Grafica[3]['alimentacion']); ?>]
+                        }, {
+                          name: 'Ocio',
+                          data: [<?php print_r($array_Grafica[0]['ocio']); ?>,<?php print_r($array_Grafica[1]['ocio']); ?>, <?php print_r($array_Grafica[2]['ocio']); ?>, <?php print_r($array_Grafica[3]['ocio']); ?>]
+                        },{
+                          name: 'Colchon',
+                          data: [<?php print_r($array_Grafica[0]['colchon']); ?>,<?php print_r($array_Grafica[1]['colchon']); ?>, <?php print_r($array_Grafica[2]['colchon']); ?>, <?php print_r($array_Grafica[3]['colchon']); ?>]
+                        },{
+                          name: 'Vvivienda',
+                          data: [<?php print_r($array_Grafica[0]['vivienda']); ?>,<?php print_r($array_Grafica[1]['vivienda']); ?>, <?php print_r($array_Grafica[2]['vivienda']); ?>, <?php print_r($array_Grafica[3]['vivienda']); ?>] 
+                        },],
+                        chart: {
+                          height: 350,
+                          type: 'area',
+                          toolbar: {
+                            show: false
+                          },
+                        },
+                        markers: {
+                          size: 4
+                        },
+                        colors: ['#4154f1', '#2eca6a', '#ff771d','#ff3067','#F9FF30','#4AFFD6'],
+                        fill: {
+                          type: "gradient",
+                          gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.3,
+                            opacityTo: 0.4,
+                            stops: [0, 90, 100]
+                          }
+                        },
+                        dataLabels: {
+                          enabled: false
+                        },
+                        stroke: {
+                          curve: 'smooth',
+                          width: 2
+                        },
+                        xaxis: {
+                          type: 'text',
+                          categories: ["Semana 1", "Semana 2", "Semana 3", "Semana 4"]
+                        },
+                        tooltip: {
+                          x: {
+                            format: 'dd/MM/yy HH:mm'
+                          },
+                        }
+                      }).render();
+                    });
+                  </script>
                           <!-- End Line Chart -->
 
                       </div>

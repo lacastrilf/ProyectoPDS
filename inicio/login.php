@@ -80,6 +80,7 @@ if(isset($_POST['enviar'])){
         <p class="sign-in">Si ya tienes una cuenta porfavor<br> ingresa aqui</p>
         <br>
         <a class="button sub sign-in" href="#">Ingresar</a>
+        
     </div>
 
     <div id="login" >
@@ -89,6 +90,7 @@ if(isset($_POST['enviar'])){
             <input type="text" placeholder="Usuario" name="usem"><br>
             <input type="password" placeholder="Password" name="password"><br>
             <input class="submit-btn" type="submit" value="Ingresar" name="ingresar" >
+           <br> <br><a href="../otro/codigo.php">¿Eres padre? Ingresa aquí. </a>
         </form>
     </div>
     <!-- Register Box -->
